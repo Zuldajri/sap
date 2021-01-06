@@ -230,7 +230,7 @@
         },
         {
             "condition": "[equals(parameters('deployGatewaySubnet'), 'Yes')]",
-            "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link')]",
+            "name": "[concat(parameters('privateDnsZoneName'), '/', 'gw-', parameters('privateDnsZoneName'), '-link')]",
             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
             "apiVersion": "2018-09-01",
             "location": "global",
@@ -246,7 +246,7 @@
         },
         {
             "condition": "[equals(parameters('deployGatewaySubnet'), 'No')]",
-            "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link')]",
+            "name": "[concat(parameters('privateDnsZoneName'), '/', 'gw-', parameters('privateDnsZoneName'), '-link')]",
             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
             "apiVersion": "2018-09-01",
             "location": "global",
