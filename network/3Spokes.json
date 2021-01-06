@@ -3,17 +3,17 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "privateDnsZoneName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "hubVnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "hubAddressPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "dmzSubnetName": {
             "type": "string"
         },
@@ -230,7 +230,7 @@
         },
         {
             "condition": "[equals(parameters('deployGatewaySubnet'), 'Yes')]",
-            "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link')]",
+            "name": "[concat(parameters('privateDnsZoneName'), '/', 'gw-', parameters('privateDnsZoneName'), '-link')]",
             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
             "apiVersion": "2018-09-01",
             "location": "global",
@@ -246,7 +246,7 @@
         },
         {
             "condition": "[equals(parameters('deployGatewaySubnet'), 'No')]",
-            "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link')]",
+            "name": "[concat(parameters('privateDnsZoneName'), '/', 'gw-', parameters('privateDnsZoneName'), '-link')]",
             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
             "apiVersion": "2018-09-01",
             "location": "global",
@@ -260,44 +260,41 @@
                 "registrationEnabled": true
             }
         },
-
-
-
         {
-			"type": "Microsoft.Network/virtualNetworks",
-			"name": "[variables('spoke1VnetName')]",
-			"location": "[variables('location')]",
-			"apiVersion": "2019-09-01",
-			"properties": {
+	    "type": "Microsoft.Network/virtualNetworks",
+	    "name": "[variables('spoke1VnetName')]",
+	    "location": "[variables('location')]",
+	    "apiVersion": "2019-09-01",
+	    "properties": {
                 "enableDdosProtection": false,
                 "enableVmProtection": false,
-				"addressSpace": {
-					"addressPrefixes": [
-						"[variables('spoke1AddressPrefix')]"
-					]
-				},
-				"subnets": [
-					{
-						"name": "[variables('spoke1DBSubnetName')]",
-						"properties": {
-							"addressPrefix": "[variables('spoke1DBSubnetPrefix')]"
-						}
-					},
-					{
-						"name": "[variables('spoke1AppSubnetName')]",
-						"properties": {
-							"addressPrefix": "[variables('spoke1AppSubnetPrefix')]"
-						}
-					},
-                    {
-						"name": "[variables('spoke1MgmtSubnetName')]",
-						"properties": {
-							"addressPrefix": "[variables('spoke1MgmtSubnetPrefix')]"
-						}
-					}
-				]
-			}
+		"addressSpace": {
+		    "addressPrefixes": [
+	    	        "[variables('spoke1AddressPrefix')]"
+		    ]
 		},
+		"subnets": [
+		    {
+		  	"name": "[variables('spoke1DBSubnetName')]",
+			"properties": {
+				"addressPrefix": "[variables('spoke1DBSubnetPrefix')]"
+			}
+		    },
+		    {
+			"name": "[variables('spoke1AppSubnetName')]",
+			"properties": {
+				"addressPrefix": "[variables('spoke1AppSubnetPrefix')]"
+			}
+		    },
+                    {
+			"name": "[variables('spoke1MgmtSubnetName')]",
+			"properties": {
+				"addressPrefix": "[variables('spoke1MgmtSubnetPrefix')]"
+			}
+		    }
+		]
+	   }
+ 	},
         {
             "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link')]",
             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
