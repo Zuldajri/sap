@@ -1,0 +1,209 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+			"type": "string"
+		},
+        "adminUsername": {
+            "type": "string"
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "operatingSystem": {
+            "type": "string"
+        },
+        "adminPublicKey": {
+            "type": "securestring"
+        },
+        "staticIP": {
+            "type": "string"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+        "subnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
+        "vmName": "[parameters('vmName')]",
+        "vNicName": "[concat(parameters('vmName'),'-NIC')]",
+        "SLES 15": 
+            {
+                "sku": "15",
+                "offer": "SLES-Priority",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES 12 SP3": 
+            {
+                "sku": "12-SP3",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES 12 SP3BYOS": 
+            {
+                "sku": "12-SP3",
+                "offer": "SLES-SAP-BYOS",
+                "publisher": "SUSE",
+                "OSType": "Linux",
+                "version": "latest"
+            },
+        "SLES 12 SP2": 
+            {
+                "sku": "12-SP2",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES 12 SP2 BYOS": 
+            {
+                "sku": "12-SP2",
+                "offer": "SLES-SAP-BYOS",
+                "publisher": "SUSE",
+                "OSType": "Linux",
+                "version": "latest"
+            },
+        "OperatingSystemSpec": {
+            "imagePublisher": "[variables(parameters('OperatingSystem')).publisher]",
+            "imageOffer": "[variables(parameters('OperatingSystem')).offer]",
+            "sku": "[variables(parameters('OperatingSystem')).sku]",
+            "version": "latest"
+        },
+        "PublicIpAddressName":"ipcftsapbitspip",
+        "networkSecurityGroupName":"ipcftsapbitsnsg"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
+            "apiVersion": "2019-09-01",
+            "location": "[parameters('location')]",
+            "tags": {},
+            "properties": {
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "sku": {
+                "name": "basic"
+            },
+            "name": "[variables('PublicIpAddressName')]",
+            "apiVersion": "2019-09-01",
+            "location": "[parameters('location')]",
+            "tags": {},
+            "properties": {
+                "publicIpAllocationMethod": "dynamic"
+            }
+        },
+        {
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('vNicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('PublicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipcftsapbits",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('StaticIP')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses',variables('PublicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },   
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('vmName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('vNicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2s_v3"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('OperatingSystemSpec').imagePublisher]",
+                        "offer": "[variables('OperatingSystemSpec').imageOffer]",
+                        "sku": "[variables('OperatingSystemSpec').sku]",
+                        "version": "[variables('OperatingSystemSpec').version]"
+                    },
+                    "osDisk": {
+						"name": "[concat(variables('vmName'), '-OSDisk')]",
+						"managedDisk": {
+							"storageAccountType": "Premium_LRS"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage",
+						"diskSizeGB": 128,
+						"osType": "Linux"
+					},
+                    "dataDisks": [{
+			            "name": "[concat(variables('vmName'), '-DataDisk')]",
+			            "diskSizeGB": 1024,
+			            "lun": 0,
+			            "managedDisk": {
+				            "storageAccountType": "Premium_LRS"
+			            },
+			            "createOption": "Empty"
+		            }]            
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true,
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').primaryEndpoints['blob']]"
+					}
+				}
+            },
+            "resources": []
+        }
+    ],
+    "outputs": {}
+}
+
