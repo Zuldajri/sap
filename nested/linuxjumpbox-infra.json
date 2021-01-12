@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-			"type": "string"
+	    "type": "string"
 		},
         "adminUsername": {
             "type": "string"
@@ -28,7 +28,22 @@
         },
         "storageAccountName": {
             "type": "string"
-        }
+        },
+	    "customUri": {
+            "type": "string"
+        },
+        "sapid": {
+            "type": "string"
+        },
+        "sappasswd": {
+            "type": "string"
+        },
+        "downloadbitsfrom": {
+            "type": "string"
+        },
+        "SAPSOFTWARETODOWNLOAD": {
+            "type": "string"
+        }  
     },
     "variables": {
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
@@ -202,6 +217,27 @@
 				}
             },
             "resources": []
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/', 'CustomScript')]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/Zuldajri/sap/main/scripts/linuxjumpbox-inst.sh"
+                    ],
+                    "commandToExecute": "[concat('bash linuxjumpbox-inst.sh \"',parameters('customURI'),'\" \"',parameters('sapid'),'\" \"',parameters('sappasswd'),'\" \"' ,parameters('downloadbitsfrom'),'\" \"' ,parameters('SAPSOFTWARETODOWNLOAD'),'\"')]"
+                }
+            }
         }
     ],
     "outputs": {}
