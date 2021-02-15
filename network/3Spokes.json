@@ -35,6 +35,9 @@
         "deployGatewaySubnet": {
 			"type": "string"
 		},
+        "gatewaySku": {
+			"type": "string"
+		},
         "gatewaySubnetName": {
 			"type": "string"
 		},
@@ -153,8 +156,10 @@
         "spoke3AppSubnetName": "[parameters('spoke3AppSubnetName')]",
         "spoke3AppSubnetPrefix": "[parameters('spoke3AppSubnetPrefix')]",
         "spoke3MgmtSubnetName": "[parameters('spoke3MgmtSubnetName')]",
-        "spoke3MgmtSubnetPrefix": "[parameters('spoke3MgmtSubnetPrefix')]"
-
+        "spoke3MgmtSubnetPrefix": "[parameters('spoke3MgmtSubnetPrefix')]",
+        "gatewayName": "hubVpnGateway",
+        "gatewayPIPName": "hubVpnGatewayPublicIp",
+        "subnetGatewayId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]"
     },
     "resources":   [
         {
@@ -563,7 +568,8 @@
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('sharedServicesSubnetName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('dmzSubnetName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke2VnetName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke2VnetName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('gatewayName'))]"
             ],
             "properties": {
                 "allowVirtualNetworkAccess": true,
@@ -610,7 +616,8 @@
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('sharedServicesSubnetName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('dmzSubnetName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke3VnetName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke3VnetName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('gatewayName'))]"
             ],
             "properties": {
                 "allowVirtualNetworkAccess": true,
@@ -657,7 +664,8 @@
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('sharedServicesSubnetName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('dmzSubnetName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke1VnetName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke1VnetName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('gatewayName'))]"
             ],
             "properties": {
                 "allowVirtualNetworkAccess": true,
@@ -691,7 +699,49 @@
                     "id": "[variables('hubID')]"
                 }
             }
+        },
+        {
+            "apiVersion": "2019-11-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('gatewayPIPName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "condition": "[equals(parameters('deployGatewaySubnet'), 'Yes')]",
+            "apiVersion": "2019-11-01",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[variables('gatewayName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('gatewayPIPName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                {
+                    "properties": {
+                        "privateIPAllocationMethod": "Dynamic",
+                        "subnet": {
+                            "id": "[variables('subnetGatewayId')]"
+                        },
+                        "publicIPAddress": {
+                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('gatewayPIPName'))]"
+                        }
+                    },
+                    "name": "vnetGatewayConfig"
+                 }
+                ],
+                "sku": {
+                    "name": "[parameters('gatewaySku')]",
+                    "tier": "[parameters('gatewaySku')]"
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false
+            }
         }
     ]
 }
-    
