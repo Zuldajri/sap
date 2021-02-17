@@ -1,0 +1,134 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+	        "type": "string"
+		},
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "vmSize": {
+            "type": "string"
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "staticIP": {
+            "type": "string"
+        },
+	"winJumpboxIpAllocationMethod": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+        "subnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
+        "vNicName": "[concat(parameters('vmName'),'NIC')]",
+        "publicIpName": "[concat(parameters('vmName'),'-PIP')]",
+        "osDiskName": "[concat(parameters('vmName'),'-OsDisk')]",
+        "apiVersion": "2015-06-15"
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIpName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[parameters('winJumpboxIpAllocationMethod')]"
+            }
+        },
+        {
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('vNicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('staticIP')]",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('vNICName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": true
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[variables('osDiskName')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "diskSizeGB": 128,
+                        "managedDisk": {
+                            "storageAccounttype": "Premium_LRS"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints.blob)]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
