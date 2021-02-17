@@ -4,8 +4,17 @@
     "parameters": {
         "location": {
 	    "type": "string"
-		},
+	    },
         "adminUsername": {
+            "type": "string"
+        },
+        "adminPublicKey": {
+            "type": "securestring"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "vmSize": {
             "type": "string"
         },
         "vnetName": {
@@ -17,43 +26,35 @@
         "operatingSystem": {
             "type": "string"
         },
-        "adminPublicKey": {
-            "type": "securestring"
-        },
         "staticIP": {
             "type": "string"
         },
-        "vmName": {
+	"linuxJumpboxIpAllocationMethod": {
             "type": "string"
         },
         "storageAccountName": {
             "type": "string"
-        },
-	    "customUri": {
-            "type": "string"
-        },
-        "sapid": {
-            "type": "string"
-        },
-        "sappasswd": {
-            "type": "string"
-        },
-        "downloadbitsfrom": {
-            "type": "string"
-        },
-        "SAPSOFTWARETODOWNLOAD": {
-            "type": "string"
-        }  
+        }
     },
     "variables": {
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
         "subnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
-        "vmName": "[parameters('vmName')]",
         "vNicName": "[concat(parameters('vmName'),'-NIC')]",
+        "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
+        "publicIpName": "[concat(parameters('vmName'),'-PIP')]",
+        "osDiskName": "[concat(parameters('vmName'),'-OsDisk')]",
         "SLES 15": 
             {
                 "sku": "15",
                 "offer": "SLES-Priority",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES 12 SP4": 
+            {
+                "sku": "12-SP4",
+                "offer": "SLES-SAP",
                 "publisher": "SUSE",
                 "version": "latest",
                 "OSType": "Linux"
@@ -66,38 +67,46 @@
                 "version": "latest",
                 "OSType": "Linux"
             },
-        "SLES 12 SP3BYOS": 
+        "RHEL 7.4": 
             {
-                "sku": "12-SP3",
-                "offer": "SLES-SAP-BYOS",
-                "publisher": "SUSE",
-                "OSType": "Linux",
-                "version": "latest"
-            },
-        "SLES 12 SP2": 
-            {
-                "sku": "12-SP2",
-                "offer": "SLES-SAP",
-                "publisher": "SUSE",
+                "sku": "7.4",
+                "offer": "RHEL",
+                "publisher": "RedHat",
                 "version": "latest",
                 "OSType": "Linux"
             },
-        "SLES 12 SP2 BYOS": 
+        "RHEL 7.5": 
             {
-                "sku": "12-SP2",
-                "offer": "SLES-SAP-BYOS",
-                "publisher": "SUSE",
-                "OSType": "Linux",
-                "version": "latest"
+                "sku": "7.5",
+                "offer": "RHEL",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
             },
+        "RHEL 7.6": 
+            {
+                "sku": "7.6",
+                "offer": "RHEL",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.7": 
+            {
+                "sku": "7.7",
+                "offer": "RHEL",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        
         "OperatingSystemSpec": {
             "imagePublisher": "[variables(parameters('OperatingSystem')).publisher]",
             "imageOffer": "[variables(parameters('OperatingSystem')).offer]",
             "sku": "[variables(parameters('OperatingSystem')).sku]",
             "version": "latest"
         },
-        "PublicIpAddressName":"ipcftsapbitspip",
-        "networkSecurityGroupName":"ipcftsapbitsnsg"
+        "apiVersion": "2015-06-15"
     },
     "resources": [
         {
@@ -111,15 +120,11 @@
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "sku": {
-                "name": "basic"
-            },
-            "name": "[variables('PublicIpAddressName')]",
+            "name": "[variables('publicIpName')]",
             "apiVersion": "2019-09-01",
             "location": "[parameters('location')]",
-            "tags": {},
             "properties": {
-                "publicIpAllocationMethod": "dynamic"
+                "publicIpAllocationMethod": "[parameters('linuxJumpboxIpAllocationMethod')]"
             }
         },
         {
@@ -128,12 +133,13 @@
             "name": "[variables('vNicName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIpAddresses/', variables('PublicIpAddressName'))]"
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
                     {
-                        "name": "ipcftsapbits",
+                        "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('StaticIP')]",
@@ -141,27 +147,30 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "publicIpAddress": {
-                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses',variables('PublicIpAddressName'))]"
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses',variables('publicIpName'))]"
                             }
                         }
                     }
-                ]
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
             }
         },   
         {
             "apiVersion": "2019-07-01",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[variables('vmName')]",
+            "name": "[parameters('vmName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('vNicName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_D2s_v3"
+                    "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[variables('vmName')]",
+                    "computerName": "[parameters('vmName')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
@@ -183,7 +192,7 @@
                         "version": "[variables('OperatingSystemSpec').version]"
                     },
                     "osDisk": {
-						"name": "[concat(variables('vmName'), '-OSDisk')]",
+						"name": "[variables('osDiskName')]",
 						"managedDisk": {
 							"storageAccountType": "Premium_LRS"
 						},
@@ -191,16 +200,7 @@
 						"createOption": "FromImage",
 						"diskSizeGB": 128,
 						"osType": "Linux"
-					},
-                    "dataDisks": [{
-			            "name": "[concat(variables('vmName'), '-DataDisk')]",
-			            "diskSizeGB": 1024,
-			            "lun": 0,
-			            "managedDisk": {
-				            "storageAccountType": "Premium_LRS"
-			            },
-			            "createOption": "Empty"
-		            }]            
+					}  
                 },
                 "networkProfile": {
                     "networkInterfaces": [
@@ -212,34 +212,11 @@
                 "diagnosticsProfile": {
 					"bootDiagnostics": {
 						"enabled": true,
-						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').primaryEndpoints['blob']]"
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints['blob']]"
 					}
 				}
-            },
-            "resources": []
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/', 'CustomScript')]",
-            "apiVersion": "2019-07-01",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": [
-                        "https://raw.githubusercontent.com/Zuldajri/sap/main/scripts/linuxjumpbox-inst.sh"
-                    ],
-                    "commandToExecute": "[concat('bash linuxjumpbox-inst.sh \"',parameters('customURI'),'\" \"',parameters('sapid'),'\" \"',parameters('sappasswd'),'\" \"' ,parameters('downloadbitsfrom'),'\" \"' ,parameters('SAPSOFTWARETODOWNLOAD'),'\"')]"
-                }
             }
         }
     ],
     "outputs": {}
 }
-
