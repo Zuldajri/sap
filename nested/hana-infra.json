@@ -1,0 +1,285 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "string",
+            "maxLength": 13
+        },
+        "vmSize": {
+            "type": "string"
+        },   
+        "vnetName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPublicKey": {
+            "type": "securestring"
+        },
+        "operatingSystem": {
+            "type": "string",
+            "allowedValues": [
+		        "SLES for SAP 15",
+                "SLES for SAP 12 SP4",
+		        "SLES for SAP 12 SP3",
+                "RHEL 7.4 for SAP HANA",
+		        "RHEL 7.5 for SAP HANA",
+                "RHEL 7.6 for SAP HANA",
+                "RHEL 7.7 for SAP HANA",
+                "RHEL 7.6"
+            ]
+        },
+        "staticIP": {
+            "type": "string"
+        },
+        "hanaVmIpAllocationMethod": {
+            "type": "string"
+        },
+	    "storageAccountName": {
+            "type": "string"
+        },
+        "availSetName": {
+            "type": "string"
+        }
+    },
+  "variables": {
+    "baseUri": "https://raw.githubusercontent.com/Zuldajri/sap/master/",
+    "smallUri": "[concat(variables('baseUri'),'nested/small.json')]",
+    "mediumUri": "[concat(variables('baseUri'),'nested/medium.json')]",
+    "largeUri": "[concat(variables('baseUri'),'nested/large.json')]",
+    "extralargeUri": "[concat(variables('baseUri'),'nested/extralarge.json')]",
+    "superlargeUri": "[concat(variables('baseUri'),'nested/superlarge.json')]",	  
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+    "hanaSubnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
+    "vmSizeArray": "[split(parameters('vmSize'),' ')]",
+    "vmSize": "[variables('vmSizeArray')[0]]"
+},
+    "resources": [
+          { 
+            "condition": "[or(or(or(equals(variables('vmSize'),'Standard_E8s_v3'),equals(variables('vmSize'),'Standard_E16s_v3')),or(equals(variables('vmSize'),'Standard_E32s_v3'),equals(variables('vmSize'),'Standard_E64s_v3'))),or(or(equals(variables('vmSize'),'Standard_GS5'),equals(variables('vmSize'),'Standard_M32ts')),or(equals(variables('vmSize'),'Standard_M32ls'),equals(variables('vmSize'),'Standard_M64ls'))))]",
+            "apiVersion": "2019-05-01",
+            "name": "[concat('SmallLinkedTemplate', parameters('vmName'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('smallUri')]"
+                },
+                "parameters": {           
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "hanaSubnetRef": {
+                        "value": "[variables('hanaSubnetRef')]"
+                    },
+                    "operatingSystem": {
+                        "value": "[parameters('operatingSystem')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPublicKey": {
+                        "value": "[parameters('adminPublicKey')]"
+                    },
+                    "vmSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "ipAllocationMethod":{
+                        "value": "[parameters('hanaVmIpAllocationMethod')]"
+                    },
+                    "staticIP":{
+                        "value": "[parameters('staticIP')]"
+                    },
+                    "availSetName": {
+                        "value": "[parameters('availSetName')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                      }
+                }
+            }
+        },
+        {
+            "condition": "[equals(variables('vmSize'),'Standard_M64s')]",
+            "apiVersion": "2019-05-01",
+            "name":"[concat('MediumLinkedTemplate', parameters('vmName'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('mediumUri')]"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "hanaSubnetRef": {
+                        "value": "[variables('hanaSubnetRef')]"
+                    },
+                    "operatingSystem": {
+                        "value": "[parameters('operatingSystem')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPublicKey": {
+                        "value": "[parameters('adminPublicKey')]"
+                    },
+                    "vmSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "ipAllocationMethod":{
+                        "value": "[parameters('hanaVmIpAllocationMethod')]"
+                    },
+                    "staticIP":{
+                        "value": "[parameters('staticIP')]"
+                    },
+                    "availSetName": {
+                        "value": "[parameters('availSetName')]"
+                      },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                      }
+                }
+            }
+        },
+        {
+            "condition": "[or(equals(variables('vmSize'),'Standard_M64ms'),equals(variables('vmSize'),'Standard_M128s'))]",
+            "apiVersion": "2019-05-01",
+            "name": "[concat('LargeLinkedTemplate', parameters('vmName'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('largeUri')]"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "hanaSubnetRef": {
+                        "value": "[variables('hanaSubnetRef')]"
+                    },
+                    "operatingSystem": {
+                        "value": "[parameters('operatingSystem')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPublicKey": {
+                        "value": "[parameters('adminPublicKey')]"
+                    },
+                    "vmSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "ipAllocationMethod":{
+                        "value": "[parameters('hanaVmIpAllocationMethod')]"
+                    },
+                    "staticIP":{
+                        "value": "[parameters('staticIP')]"
+                    },
+                    "availSetName": {
+                        "value": "[parameters('availSetName')]"
+                      },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                      }
+                }
+            }
+        },
+        {
+            "condition": "[equals(variables('vmSize'), 'Standard_M128ms')]",
+            "apiVersion": "2019-05-01",
+            "name": "[concat('extraLargeLinkedTemplate', parameters('vmName'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('extralargeUri')]"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "hanaSubnetRef": {
+                        "value": "[variables('hanaSubnetRef')]"
+                    },
+                    "operatingSystem": {
+                        "value": "[parameters('operatingSystem')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPublicKey": {
+                        "value": "[parameters('adminPublicKey')]"
+                    },
+                    "vmSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "ipAllocationMethod":{
+                        "value": "[parameters('hanaVmIpAllocationMethod')]"
+                    },
+                    "staticIP":{
+                        "value": "[parameters('staticIP')]"
+                    },
+                    "availSetName": {
+                        "value": "[parameters('availSetName')]"
+                      },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                      }
+                } 
+	        }
+        },
+        {
+            "condition": "[or(or(equals(variables('vmSize'),'Standard_M208s_v2'),equals(variables('vmSize'),'Standard_M208ms_v2')), or(equals(variables('vmSize'),'Standard_M416s_v2'),equals(variables('vmSize'),'Standard_M416ms_v2')))]",
+            "apiVersion": "2019-05-01",
+            "name": "[concat('superLargeLinkedTemplate', parameters('vmName'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('superlargeUri')]"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "hanaSubnetRef": {
+                        "value": "[variables('hanaSubnetRef')]"
+                    },
+                    "operatingSystem": {
+                        "value": "[parameters('operatingSystem')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPublicKey": {
+                        "value": "[parameters('adminPublicKey')]"
+                    },
+                    "vmSize": {
+                        "value": "[variables('vmSize')]"
+                    },
+                    "ipAllocationMethod":{
+                        "value": "[parameters('hanaVmIpAllocationMethod')]"
+                    },
+                    "staticIP":{
+                        "value": "[parameters('staticIP')]"
+                    },
+                    "availSetName": {
+                        "value": "[parameters('availSetName')]"
+                      },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                      }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
