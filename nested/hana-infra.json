@@ -24,11 +24,11 @@
         "operatingSystem": {
             "type": "string",
             "allowedValues": [
-		        "SLES for SAP 15",
+		"SLES for SAP 15",
                 "SLES for SAP 12 SP4",
-		        "SLES for SAP 12 SP3",
+		"SLES for SAP 12 SP3",
                 "RHEL 7.4 for SAP HANA",
-		        "RHEL 7.5 for SAP HANA",
+		"RHEL 7.5 for SAP HANA",
                 "RHEL 7.6 for SAP HANA",
                 "RHEL 7.7 for SAP HANA",
                 "RHEL 7.6"
@@ -40,7 +40,7 @@
         "hanaVmIpAllocationMethod": {
             "type": "string"
         },
-	    "storageAccountName": {
+	"storageAccountName": {
             "type": "string"
         },
         "availSetName": {
@@ -141,10 +141,10 @@
                     },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
-                      },
+                    },
                     "storageAccountName": {
                         "value": "[parameters('storageAccountName')]"
-                      }
+                    }
                 }
             }
         },
@@ -224,17 +224,17 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-		   "staticIP":{
+		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
-                      },
+                    },
                     "storageAccountName": {
                         "value": "[parameters('storageAccountName')]"
-                      }
+                    }
                 } 
-	        }
+	    }
         },
         {
             "condition": "[or(or(equals(variables('vmSize'),'Standard_M208s_v2'),equals(variables('vmSize'),'Standard_M208ms_v2')), or(equals(variables('vmSize'),'Standard_M416s_v2'),equals(variables('vmSize'),'Standard_M416ms_v2')))]",
