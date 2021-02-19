@@ -34,7 +34,10 @@
                 "RHEL 7.6"
             ]
         },
-        "staticIP": {
+        "lbStaticIP": {
+            "type": "string"
+        },  
+	"staticIP": {
             "type": "string"
         },
         "hanaVmIpAllocationMethod": {
@@ -92,7 +95,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "staticIP":{
+                    "lbStaticIP":{
+                        "value": "[parameters('lbStaticIP')]"
+                    },
+		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
                     "availSetName": {
@@ -136,7 +142,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "staticIP":{
+                    "lbStaticIP":{
+                        "value": "[parameters('lbStaticIP')]"
+                    },
+		   "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
                     "availSetName": {
@@ -180,7 +189,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "staticIP":{
+                    "lbStaticIP":{
+                        "value": "[parameters('lbStaticIP')]"
+                    },
+		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
                     "availSetName": {
@@ -224,7 +236,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "staticIP":{
+                    "lbStaticIP":{
+                        "value": "[parameters('lbStaticIP')]"
+                    },
+		   "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
                     "availSetName": {
@@ -268,7 +283,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "staticIP":{
+                    "lbStaticIP":{
+                        "value": "[parameters('lbStaticIP')]"
+                    },
+		   "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
                     "availSetName": {
