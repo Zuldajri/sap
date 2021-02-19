@@ -1,0 +1,552 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "string"
+        },
+        "hanaSubnetRef": {
+            "type": "string"
+        },
+        "operatingSystem": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPublicKey": {
+            "type": "securestring"
+        },
+        "vmSize": {
+            "type": "string"
+        },
+        "ipAllocationMethod": {
+            "type": "string"
+        },
+        "staticIP": {
+            "type": "string"
+        },
+        "availSetName": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "nicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static-NIC'), concat(parameters('vmName'),'-dynamic-NIC'))]",
+        "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
+        "subnetRef": "[parameters('HANASubnetRef')]",
+        "SLES for SAP 15": 
+            {
+                "sku": "15",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES for SAP 12 SP4": 
+            {
+                "sku": "12-SP4",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES for SAP 12 SP3": 
+            {
+                "sku": "12-SP3",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+       
+        "RHEL 7.7 for SAP HANA": 
+            {
+                "sku": "7.7",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.6 for SAP HANA": 
+            {
+                "sku": "7.6",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.5 for SAP HANA": 
+            {
+                "sku": "7.5",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.4 for SAP HANA": 
+            {
+                "sku": "7.6",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.6": 
+            {
+                "sku": "7.6",
+                "offer": "RHEL",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "operatingSystemSpec": {
+            "imagePublisher": "[variables(parameters('operatingSystem')).publisher]",
+            "imageOffer": "[variables(parameters('operatingSystem')).offer]",
+            "sku": "[variables(parameters('operatingSystem')).sku]",
+            "version": "latest"
+        },
+        "diskConfig": "[variables(concat('diskConfig_', parameters('vmSize')))]",
+        "diskConfig_Standard_M208s_v2": {
+            "shared": 1024,
+            "sap": 64,
+            "backup": 2048,
+            "data1": 1024,
+            "data2": 1024,
+            "data3": 1024,
+            "data4": 1024,
+            "log1": 512,
+            "log2": 512,
+            "log3": 512,
+            "boot": 128
+        },
+        "diskConfig_Standard_M208ms_v2": {
+            "shared": 1024,
+            "sap": 64,
+            "backup": 2048,
+            "data1": 2048,
+            "data2": 2048,
+            "data3": 2048,
+            "data4": 2048,
+            "log1": 512,
+            "log2": 512,
+            "log3": 512,
+            "boot": 128
+        },
+        "diskConfig_Standard_M416s_v2": {
+            "shared": 1024,
+            "sap": 64,
+            "backup": 2048,
+            "data1": 2048,
+            "data2": 2048,
+            "data3": 2048,
+            "data4": 2048,
+            "log1": 512,
+            "log2": 512,
+            "log3": 512,
+            "boot": 128
+        },
+        "diskConfig_Standard_M416ms_v2": {
+            "shared": 1024,
+            "sap": 64,
+            "backup": 2048,
+            "data1": 2048,
+            "data2": 2048,
+            "data3": 2048,
+            "data4": 2048,
+            "log1": 512,
+            "log2": 512,
+            "log3": 512,
+            "boot": 128
+        },
+        "apiVersion": "2015-06-15"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
+            "apiVersion": "2019-09-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+            }
+        },
+        {
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "enableAcceleratedNetworking": true,
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('IPAllocationMethod')]",
+                            "privateIPAddress": "[parameters('StaticIP')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanashared-01')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').shared]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-usrsap-01')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').sap]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanabackup-01')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').backup]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanadata-01')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').data1]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanadata-02')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').data2]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanadata-03')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').data3]"
+            }
+        },        
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanadata-04')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').data4]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanalog-01')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').log1]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanalog-02')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').log2]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-hanalog-03')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').log3]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "name": "[concat(parameters('vmName'),'-sapmnt-01')]",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[variables('diskConfig').boot]"
+            }
+        },                              
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('availSetName')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 5
+            }
+        },
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanashared-01'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-usrsap-01'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanabackup-01'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-01'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-02'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-03'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-04'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-01'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-02'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-03'))]",
+                "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-sapmnt-01'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('availSetName'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availSetName'))]"
+                  },                
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('operatingSystemSpec').imagePublisher]",
+                        "offer": "[variables('operatingSystemSpec').imageOffer]",
+                        "sku": "[variables('operatingSystemSpec').sku]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('vmName'),'-OsDisk')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "diskSizeGB": 128,
+                        "managedDisk": {
+                              "storageAccountType": "Premium_LRS"
+                        }
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 1,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-01'))]"
+                            }
+                        },
+                        {
+                            "lun": 2,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-02'))]"
+                            }
+                        },
+                        {
+                            "lun": 3,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-03'))]"
+                            }
+                        },
+                        {
+                            "lun": 4,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-04'))]"
+                            }
+                        },
+                        {
+                            "lun": 5,
+                            "createOption": "Attach",
+                            "writeAcceleratorEnabled": true,
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-01'))]"
+                            }
+                        },
+                        {
+                            "lun": 6,
+                            "createOption": "Attach",
+                            "writeAcceleratorEnabled": true,
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-02'))]"
+                            }
+                        },
+                        {
+                            "lun": 7,
+                            "createOption": "Attach",
+                            "writeAcceleratorEnabled": true,
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-03'))]"
+                            }
+                        },
+                        {
+                            "lun": 8,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanashared-01'))]"
+                            }
+                        },
+                        {
+                            "lun": 9,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanabackup-01'))]"
+                            }
+                        },
+                        {
+                            "lun": 10,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-usrsap-01'))]"
+                            }
+                        },
+                        {
+                            "lun": 11,
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-sapmnt-01'))]"
+                            }
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true,
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints['blob']]"
+					}
+				}
+            }
+        }
+    ],
+    "outputs": {}
+}
