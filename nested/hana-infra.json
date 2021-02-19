@@ -34,9 +34,6 @@
                 "RHEL 7.6"
             ]
         },
-        "lbStaticIP": {
-            "type": "string"
-        },  
 	"staticIP": {
             "type": "string"
         },
@@ -95,9 +92,6 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "lbStaticIP":{
-                        "value": "[parameters('lbStaticIP')]"
-                    },
 		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
@@ -141,9 +135,6 @@
                     },
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
-                    },
-                    "lbStaticIP":{
-                        "value": "[parameters('lbStaticIP')]"
                     },
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
@@ -189,9 +180,6 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "lbStaticIP":{
-                        "value": "[parameters('lbStaticIP')]"
-                    },
 		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
@@ -236,9 +224,6 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-                    "lbStaticIP":{
-                        "value": "[parameters('lbStaticIP')]"
-                    },
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
@@ -282,9 +267,6 @@
                     },
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
-                    },
-                    "lbStaticIP":{
-                        "value": "[parameters('lbStaticIP')]"
                     },
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
