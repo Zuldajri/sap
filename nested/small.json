@@ -239,7 +239,6 @@
             ],
             "properties": {
                 "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",
