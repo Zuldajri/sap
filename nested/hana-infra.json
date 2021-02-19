@@ -40,9 +40,6 @@
 	"staticIP": {
             "type": "string"
         },
-	"adminStaticIP": {
-            "type": "string"
-        },
         "hanaVmIpAllocationMethod": {
             "type": "string"
         },
@@ -104,9 +101,6 @@
 		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-		    "adminStaticIP":{
-                        "value": "[parameters('adminStaticIP')]"
-                    },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
                     },
@@ -153,9 +147,6 @@
                     },
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
-                    },
-		    "adminStaticIP":{
-                        "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
@@ -204,9 +195,6 @@
 		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-		    "adminStaticIP":{
-                        "value": "[parameters('adminStaticIP')]"
-                    },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
                       },
@@ -254,9 +242,6 @@
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-	            "adminStaticIP":{
-                        "value": "[parameters('adminStaticIP')]"
-                    },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
                       },
@@ -303,9 +288,6 @@
                     },
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
-                    },
-		    "adminStaticIP":{
-                        "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
