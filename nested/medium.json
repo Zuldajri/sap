@@ -26,6 +26,9 @@
         "staticIP": {
             "type": "string"
         },
+        "availSetName": {
+            "type": "string"
+        },
         "storageAccountName": {
             "type": "string"
         }
@@ -119,7 +122,8 @@
             "log2": 256,
             "log3": 256,
             "boot": 64
-        }
+        },
+        "apiVersion": "2015-06-15"
     },
     "resources": [
         {
@@ -326,7 +330,7 @@
         },                              
         {
             "type": "Microsoft.Compute/availabilitySets",
-            "name": "[parameters('AvailSetName')]",
+            "name": "[parameters('availSetName')]",
             "apiVersion": "2018-06-01",
             "location": "[resourceGroup().location]",
             "sku": {
@@ -355,11 +359,11 @@
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-02'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-03'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-sapmnt-01'))]",
-                "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('availSetName'))]"
             ],
             "properties": {
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availSetName'))]"
                   },                
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
