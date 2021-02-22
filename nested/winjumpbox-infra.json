@@ -36,7 +36,7 @@
     "variables": {
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
         "subnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
-        "vNicName": "[concat(parameters('vmName'),'NIC')]",
+        "vNicName": "[concat(parameters('vmName'),'-NIC')]",
 	"networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
         "publicIpName": "[concat(parameters('vmName'),'-PIP')]",
         "osDiskName": "[concat(parameters('vmName'),'-OsDisk')]",
