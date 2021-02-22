@@ -164,19 +164,6 @@
             "log3": 128,
             "boot": 64
         },
-        "diskConfig_Standard_GS5": {
-            "shared": 512,
-            "sap": 64,
-            "backup": 1024,
-            "data1": 512,
-            "data2": 512,
-            "data3": 512,
-            "data4": 512,
-            "log1": 128,
-            "log2": 128,
-            "log3": 128,
-            "boot": 64
-        },
         "diskConfig_Standard_M32ts": {
             "shared": 512,
             "sap": 64,
@@ -229,36 +216,6 @@
             }
         },
         {
-            "condition": "[equals(parameters('vmSize'), 'Standard_GS5')]",
-            "apiVersion": "2019-09-01",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(variables('nicName'), '-noaccel')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
-            ],
-            "properties": {
-                "enableAcceleratedNetworking": false,
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "[parameters('IPAllocationMethod')]",
-                            "privateIPAddress": "[parameters('StaticIP')]",
-                            "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            },
-                            "privateIPAddressVersion": "IPv4"
-                        }
-                    }
-                ],
-                "networkSecurityGroup": {
-					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
-                }
-            }
-        },
-        {
-            "condition": "[or(or(or(equals(parameters('vmSize'),'Standard_E8s_v3'),equals(parameters('vmSize'),'Standard_E16s_v3')),or(equals(parameters('vmSize'),'Standard_E32s_v3'),equals(parameters('vmSize'),'Standard_E64s_v3'))),or(or(equals(parameters('vmSize'),'Standard_E48_v3'),equals(parameters('vmSize'),'Standard_M32ts')),or(equals(parameters('vmSize'),'Standard_M32ls'),equals(parameters('vmSize'),'Standard_M64ls'))))]",
             "apiVersion": "2019-09-01",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
@@ -467,7 +424,7 @@
 
 
         {
-            "condition": "[or(or(or(equals(parameters('vmSize'),'Standard_E8s_v3'),equals(parameters('vmSize'),'Standard_E16s_v3')),or(equals(parameters('vmSize'),'Standard_E32s_v3'),equals(parameters('vmSize'),'Standard_E64s_v3'))),or(or(equals(parameters('vmSize'),'Standard_E48_v3'),equals(parameters('vmSize'),'Standard_GS5')),or(equals(parameters('vmSize'),'Standard_F32s_v2'),equals(parameters('vmSize'),'Standard_D40s_v3'))))]",
+            "condition": "[or(or(equals(parameters('vmSize'),'Standard_E8s_v3'),equals(parameters('vmSize'),'Standard_E16s_v3')),or(equals(parameters('vmSize'),'Standard_E32s_v3'),equals(parameters('vmSize'),'Standard_E64s_v3')))]",
             "apiVersion": "2019-07-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[parameters('vmName')]",
