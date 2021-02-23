@@ -24,17 +24,20 @@
         "operatingSystem": {
             "type": "string",
             "allowedValues": [
-		"SLES for SAP 15",
+		"SLES for SAP 15 SP1",
+                "SLES for SAP 12 SP5",
                 "SLES for SAP 12 SP4",
 		"SLES for SAP 12 SP3",
                 "RHEL 7.4 for SAP HANA",
 		"RHEL 7.5 for SAP HANA",
                 "RHEL 7.6 for SAP HANA",
-                "RHEL 7.7 for SAP HANA",
-                "RHEL 7.6"
+                "RHEL 7.7 for SAP HANA"
             ]
         },
 	"staticIP": {
+            "type": "string"
+        },
+	"adminStaticIP": {
             "type": "string"
         },
         "hanaVmIpAllocationMethod": {
@@ -95,6 +98,9 @@
 		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
+		    "adminStaticIP":{
+                        "value": "[parameters('adminStaticIP')]"
+                    },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
                     },
@@ -138,6 +144,9 @@
                     },
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
+                    },
+	            "adminStaticIP":{
+                        "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
@@ -183,6 +192,9 @@
 		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
+		    "adminStaticIP":{
+                        "value": "[parameters('adminStaticIP')]"
+                    },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
                       },
@@ -227,6 +239,9 @@
 		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
+	  	    "adminStaticIP":{
+                        "value": "[parameters('adminStaticIP')]"
+                    },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
                     },
@@ -270,6 +285,9 @@
                     },
 		   "staticIP":{
                         "value": "[parameters('staticIP')]"
+                    },
+		    "adminStaticIP":{
+                        "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
                         "value": "[parameters('availSetName')]"
