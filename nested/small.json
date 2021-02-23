@@ -26,6 +26,9 @@
         "staticIP": {
             "type": "string"
         },
+	"adminStaticIP": {
+            "type": "string"
+        },
         "availSetName": {
             "type": "string"
         },
