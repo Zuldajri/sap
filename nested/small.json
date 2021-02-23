@@ -8,6 +8,9 @@
         "hanaSubnetRef": {
             "type": "string"
         },
+	"hanaAdminSubnetRef": {
+            "type": "string"
+        },
         "operatingSystem": {
             "type": "string"
         },
@@ -39,8 +42,10 @@
     },
     "variables": {
         "nicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static-NIC'), concat(parameters('vmName'),'-dynamic-NIC'))]",
+	"adminNicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static-admin-NIC'), concat(parameters('vmName'),'-dynamic-admin-NIC'))]",
         "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
-        "subnetRef": "[parameters('HANASubnetRef')]",
+        "subnetRef": "[parameters('hanaSubnetRef')]",
+	"adminSubnetRef": "[parameters('hanaAdminSubnetRef')]",
         "SLES for SAP 15 SP1": 
             {
                 "sku": "gen1",
@@ -245,6 +250,34 @@
                 }
             }
         },
+	{
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('adminNicName')]",
+            "location": "[resourceGroup().location]",
+             "dependsOn": [
+		"[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "enableAcceleratedNetworking": true,
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('IPAllocationMethod')]",
+                            "privateIPAddress": "[parameters('adminStaticIP')]",
+                            "subnet": {
+                                "id": "[variables('adminSubnetRef')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
+            }
+        },
         {
             "type": "Microsoft.Compute/disks",
             "name": "[concat(parameters('vmName'),'-hanashared-01')]",
@@ -434,6 +467,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+		"[resourceId('Microsoft.Network/networkInterfaces',variables('adminNicName'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanashared-01'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-usrsap-01'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanabackup-01'))]",
@@ -569,7 +603,16 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+			    "properties": {
+                                "primary": false
+                            }
+                        },
+			            {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('adminNicName'))]",
+			    "properties": {
+                                "primary": true
+                            }
                         }
                     ]
                 },
@@ -589,6 +632,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+		"[resourceId('Microsoft.Network/networkInterfaces',variables('adminNicName'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanashared-01'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-usrsap-01'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanabackup-01'))]",
@@ -727,7 +771,16 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+			    "properties": {
+                                "primary": false
+                            }
+                        },
+			            {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('adminNicName'))]",
+			    "properties": {
+                                "primary": true
+                            }
                         }
                     ]
                 },
