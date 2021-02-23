@@ -15,6 +15,9 @@
         "subnetName": {
             "type": "string"
         },
+	    "adminSubnetName": {
+            "type": "string"
+        },
         "adminUsername": {
             "type": "string"
         },
@@ -24,26 +27,26 @@
         "operatingSystem": {
             "type": "string",
             "allowedValues": [
-		"SLES for SAP 15 SP1",
+		        "SLES for SAP 15 SP1",
                 "SLES for SAP 12 SP5",
                 "SLES for SAP 12 SP4",
-		"SLES for SAP 12 SP3",
+		        "SLES for SAP 12 SP3",
                 "RHEL 7.4 for SAP HANA",
-		"RHEL 7.5 for SAP HANA",
+		        "RHEL 7.5 for SAP HANA",
                 "RHEL 7.6 for SAP HANA",
                 "RHEL 7.7 for SAP HANA"
             ]
         },
-	"staticIP": {
+	    "staticIP": {
             "type": "string"
         },
-	"adminStaticIP": {
+	    "adminStaticIP": {
             "type": "string"
         },
         "hanaVmIpAllocationMethod": {
             "type": "string"
         },
-	"storageAccountName": {
+	    "storageAccountName": {
             "type": "string"
         },
         "availSetName": {
@@ -59,6 +62,7 @@
     "superlargeUri": "[concat(variables('baseUri'),'nested/superlarge.json')]",	  
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
     "hanaSubnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
+    "hanaAdminSubnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('adminSubnetName'))]",	  
     "vmSizeArray": "[split(parameters('vmSize'),' ')]",
     "vmSize": "[variables('vmSizeArray')[0]]"
 },
@@ -80,6 +84,9 @@
                     "hanaSubnetRef": {
                         "value": "[variables('hanaSubnetRef')]"
                     },
+		            "hanaAdminSubnetRef": {
+			            "value": "[variables('hanaAdminSubnetRef')]"
+		            },
                     "operatingSystem": {
                         "value": "[parameters('operatingSystem')]"
                     },
@@ -95,10 +102,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-		    "staticIP":{
+		            "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-		    "adminStaticIP":{
+		            "adminStaticIP":{
                         "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
@@ -127,6 +134,9 @@
                     "hanaSubnetRef": {
                         "value": "[variables('hanaSubnetRef')]"
                     },
+                    "hanaAdminSubnetRef": {
+			            "value": "[variables('hanaAdminSubnetRef')]"
+		            },
                     "operatingSystem": {
                         "value": "[parameters('operatingSystem')]"
                     },
@@ -142,10 +152,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-		   "staticIP":{
+		            "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-	            "adminStaticIP":{
+	                "adminStaticIP":{
                         "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
@@ -174,6 +184,9 @@
                     "hanaSubnetRef": {
                         "value": "[variables('hanaSubnetRef')]"
                     },
+                    "hanaAdminSubnetRef": {
+			            "value": "[variables('hanaAdminSubnetRef')]"
+		            },
                     "operatingSystem": {
                         "value": "[parameters('operatingSystem')]"
                     },
@@ -189,10 +202,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-		    "staticIP":{
+		            "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-		    "adminStaticIP":{
+		            "adminStaticIP":{
                         "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
@@ -221,6 +234,9 @@
                     "hanaSubnetRef": {
                         "value": "[variables('hanaSubnetRef')]"
                     },
+                    "hanaAdminSubnetRef": {
+			            "value": "[variables('hanaAdminSubnetRef')]"
+		            },
                     "operatingSystem": {
                         "value": "[parameters('operatingSystem')]"
                     },
@@ -236,10 +252,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-		    "staticIP":{
+		            "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-	  	    "adminStaticIP":{
+	  	            "adminStaticIP":{
                         "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
@@ -249,7 +265,7 @@
                         "value": "[parameters('storageAccountName')]"
                     }
                 } 
-	    }
+	        }
         },
         {
             "condition": "[or(or(equals(variables('vmSize'),'Standard_M208s_v2'),equals(variables('vmSize'),'Standard_M208ms_v2')), or(equals(variables('vmSize'),'Standard_M416s_v2'),equals(variables('vmSize'),'Standard_M416ms_v2')))]",
@@ -268,6 +284,9 @@
                     "hanaSubnetRef": {
                         "value": "[variables('hanaSubnetRef')]"
                     },
+                    "hanaAdminSubnetRef": {
+			            "value": "[variables('hanaAdminSubnetRef')]"
+		            },
                     "operatingSystem": {
                         "value": "[parameters('operatingSystem')]"
                     },
@@ -283,7 +302,7 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-		   "staticIP":{
+		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
 		    "adminStaticIP":{
