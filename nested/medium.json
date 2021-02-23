@@ -37,10 +37,18 @@
         "nicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static-NIC'), concat(parameters('vmName'),'-dynamic-NIC'))]",
         "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
         "subnetRef": "[parameters('HANASubnetRef')]",
-        "SLES for SAP 15": 
+        "SLES for SAP 15 SP1": 
             {
-                "sku": "15",
-                "offer": "SLES-SAP",
+                "sku": "gen1",
+                "offer": "sles-sap-15-sp1",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES for SAP 12 SP5": 
+            {
+                "sku": "gen1",
+                "offer": "sles-sap-12-sp5",
                 "publisher": "SUSE",
                 "version": "latest",
                 "OSType": "Linux"
@@ -61,7 +69,6 @@
                 "version": "latest",
                 "OSType": "Linux"
             },
-       
         "RHEL 7.7 for SAP HANA": 
             {
                 "sku": "7.7",
@@ -88,16 +95,8 @@
             },
         "RHEL 7.4 for SAP HANA": 
             {
-                "sku": "7.6",
+                "sku": "7.4",
                 "offer": "RHEL-SAP-HA",
-                "publisher": "RedHat",
-                "version": "latest",
-                "OSType": "Linux"
-            },
-        "RHEL 7.6": 
-            {
-                "sku": "7.6",
-                "offer": "RHEL",
                 "publisher": "RedHat",
                 "version": "latest",
                 "OSType": "Linux"
