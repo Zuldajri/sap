@@ -1,0 +1,240 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Region where the resources should be created in"
+			}
+		},
+		"sapDeploymentScriptUrl": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script Url"
+			}
+		},
+		"sapDeploymentScriptFileName": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script file name"
+			}
+		},
+		"adminUsername": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Administrator username on all VMs"
+			}
+		},
+		"hanaAdminUsername": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Hana Administrator username"
+			}
+		},
+		"sshPrivateKey": {
+			"type": "string",
+			"metadata": {
+				"description": "SSH private key for all VMs"
+			}
+		},
+		"dbSystemDbPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Administrator password for DB System DB"
+			}
+		},
+		"hanaClusterPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Administrator password for Hana Cluster"
+			}
+		},
+		"osSapadmPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Administrator password for OS SAP ADM"
+			}
+		},
+		"osSidadmPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Administrator password for OS SID ADM"
+			}
+		},
+		"linuxJumpboxVmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Linux Jumpbox VM Name"
+			}
+		},
+		"hanaVmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Hana VM Name"
+			}
+		},
+		"hanaVmSize": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Hana VM Name"
+			}
+		},
+		"dbVersion": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "DB Version"
+			}
+		},
+		"hanaInstanceNumber": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Hana Instance Number"
+			}
+		},
+		"hanaSid": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Hana SID"
+			}
+		},
+		"hanaStaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the HANA VM when Static IP Allocation Method has been selected"
+            }
+        },
+        "hanaAdminStaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the HANA VM when Static IP Allocation Method has been selected"
+            }
+        },
+		"hanaImageOffer": {
+			"type": "string"
+		},
+		"hanaImagePublisher": {
+            "type": "string"
+        },
+        "hanaImageSku": {
+            "type": "string"
+        },
+		"storageAccountName": {
+            "type": "string",
+            "metadata": {
+				"description": "Name of the Storage Account"
+			}
+        },
+		"storageAccountKey": {
+            "type": "string",
+            "metadata": {
+				"description": "Storage Account Key"
+			}
+        },
+		"proximityPlacementGroupName": {
+            "type": "string",
+            "metadata": {
+				"description": "Proximity Placement Group Name"
+			}
+        },
+		"mgmtSubnetName": {
+            "type": "string"
+        },
+        "mgmtSubnetPrefix": {
+            "type": "string"
+        },
+		"appSubnetName": {
+            "type": "string"
+        },
+        "appSubnetPrefix": {
+            "type": "string"
+        },
+		"dbSubnetName": {
+            "type": "string"
+        },
+        "dbSubnetPrefix": {
+            "type": "string"
+        },
+		"sapUsername": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "SAP username"
+			}
+		},
+        "sapPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "SAP password"
+			}
+		},
+		"scsStaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the SCS VM when Static IP Allocation Method has been selected"
+            }
+        },
+		"app1StaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the APP1 VM when Static IP Allocation Method has been selected"
+            }
+        },
+		"app2StaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the APP2 VM when Static IP Allocation Method has been selected"
+            }
+        },
+		"app3StaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the APP3 VM when Static IP Allocation Method has been selected"
+            }
+        },
+		"webStaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the WEB VM when Static IP Allocation Method has been selected"
+            }
+        }
+	},
+	"variables": {
+		"singlequote": "'",
+		"resourceGroupName": "[resourceGroup().name]"
+	},
+	"resources": [{
+		"type": "Microsoft.Compute/virtualMachines/extensions",
+		"name": "[concat(parameters('linuxJumpboxVmName'), '/deploySAP')]",
+		"location": "[parameters('location')]",
+		"apiVersion": "2019-07-01",
+		"properties": {
+			"publisher": "Microsoft.Azure.Extensions",
+			"type": "CustomScript",
+			"typeHandlerVersion": "2.0",
+			"autoUpgradeMinorVersion": true,
+			"settings": {
+				"fileUris": [
+					"[parameters('sapDeploymentScriptUrl')]"
+				]
+			},
+			"protectedSettings": {
+				"commandToExecute": "[concat('bash ', parameters('sapDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', '\"', parameters('hanaAdminUsername'), '\" ', variables('singlequote'), parameters('sshPrivateKey'), variables('singlequote'), '\"', parameters('dbSystemDbPassword'), '\" ', '\"', parameters('hanaClusterPassword'), '\" ', '\"', parameters('osSapadmPassword'), '\" ', '\"', parameters('osSidadmPassword'), '\" ', '\"', parameters('hanaVmName'), '\" ', '\"', parameters('hanaVmSize'), '\" ', '\"', parameters('dbVersion'), '\" ', '\"', parameters('hanaInstanceNumber'), '\" ', ' \"', parameters('hanaSid'), '\"', ' \"', parameters('hanaStaticIP'), '\"', ' \"', parameters('hanaAdminStaticIP'), '\"', ' \"', parameters('hanaImageOffer'), '\"', ' \"', parameters('hanaImagePublisher'), '\"', ' \"', parameters('hanaImageSku'), '\"', ' \"', parameters('storageAccountName'), '\"', ' \"', parameters('storageAccountKey'), '\"', ' \"', parameters('proximityPlacementGroupName'), '\"', '\"', variables('resourceGroupName'), '\" ', ' \"', parameters('mgmtSubnetName'), '\"', ' \"', parameters('mgmtSubnetPrefix'), '\"', ' \"', parameters('appSubnetName'), '\"', ' \"', parameters('appSubnetPrefix'), '\"', ' \"', parameters('dbSubnetName'), '\"', ' \"', parameters('dbSubnetPrefix'), '\"', ' \"', parameters('sapUsername'), '\"', ' \"', parameters('sapPassword'), '\"', ' \"', parameters('scsStaticIP'), '\"', ' \"', parameters('app1StaticIP'), '\"', ' \"', parameters('app2StaticIP'), '\"', ' \"', parameters('app3StaticIP'), '\" ', ' \"', parameters('webStaticIP'), '\"')]"
+			}
+		}
+	}],
+	"outputs": {}
+}
