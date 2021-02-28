@@ -440,6 +440,7 @@
                             "lun": 3,
                             "createOption": "Attach",
 			    "caching": "None",
+                            "writeAcceleratorEnabled": true,
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-01'))]"
                             }
@@ -448,6 +449,7 @@
                             "lun": 4,
                             "createOption": "Attach",
 			    "caching": "None",
+                            "writeAcceleratorEnabled": true,
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-02'))]"
                             }
@@ -455,7 +457,8 @@
                         {
                             "lun": 5,
                             "createOption": "Attach",
-		            "caching": "None",
+			    "caching": "None",
+                            "writeAcceleratorEnabled": true,
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-03'))]"
                             }
