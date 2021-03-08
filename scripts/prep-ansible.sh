@@ -174,5 +174,5 @@ sed -i -e '/Defaults    env_keep += "LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSE
 
 
 
-ansible-playbook -i /var/lib/waagent/custom-script/download/0/sapansible/ansible/hosts.yml /var/lib/waagent/custom-script/download/0/sapansible/ansible/sap_playbook.yml --private-key /home/$ADMIN_USER/.ssh/id_rsa
+# ansible-playbook -i /var/lib/waagent/custom-script/download/0/sapansible/ansible/hosts.yml /var/lib/waagent/custom-script/download/0/sapansible/ansible/sap_playbook.yml --private-key /home/$ADMIN_USER/.ssh/id_rsa
 
