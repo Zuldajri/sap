@@ -161,18 +161,12 @@ $WEB_STATIC_IP  ansible_connection=ssh ansible_user=azureadm
 [sqlserver]
 EOF
 
-echo $(date) " - Configuring SSH ControlPath to use shorter path name"
-
-sed -i -e "s/^# control_path = %(directory)s\/%%h-%%r/control_path = %(directory)s\/%%h-%%r/" /etc/ansible/ansible.cfg
-sed -i -e "s/^#host_key_checking = False/host_key_checking = False/" /etc/ansible/ansible.cfg
-sed -i -e "s/^#pty=False/pty=False/" /etc/ansible/ansible.cfg
-sed -i -e "s/^#pipelining = False/pipelining = True/" /etc/ansible/ansible.cfg
-
-# echo $(date) " - Modifying sudoers"
-sed -i -e "s/Defaults    requiretty/# Defaults    requiretty/" /etc/sudoers
-sed -i -e '/Defaults    env_keep += "LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY"/aDefaults    env_keep += "PATH"' /etc/sudoers
+echo "=== Run ansible playbook ==="
+echo "=== This may take quite a while, please be patient ==="
+ansible-playbook --version
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+export ANSIBLE_HOST_KEY_CHECKING=False
 
 
-
-# ansible-playbook -i /var/lib/waagent/custom-script/download/0/sapansible/ansible/hosts.yml /var/lib/waagent/custom-script/download/0/sapansible/ansible/sap_playbook.yml --private-key /home/$ADMIN_USER/.ssh/id_rsa
+ansible-playbook -i /var/lib/waagent/custom-script/download/0/sapansible/ansible/hosts.yml /var/lib/waagent/custom-script/download/0/sapansible/ansible/sap_playbook.yml --private-key /home/$ADMIN_USER/.ssh/id_rsa
 
