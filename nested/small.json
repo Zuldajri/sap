@@ -501,7 +501,7 @@
                         {
                             "lun": 1,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-01'))]"
                             }
@@ -509,7 +509,7 @@
                         {
                             "lun": 2,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-03'))]"
                             }
@@ -517,7 +517,7 @@
                         {
                             "lun": 3,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-04'))]"
                             }
@@ -525,7 +525,7 @@
                         {
                             "lun": 4,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-01'))]"
                             }
@@ -533,7 +533,7 @@
                         {
                             "lun": 5,
                             "createOption": "Attach",
-		            "caching": "None",
+		                    "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-02'))]"
                             }
@@ -541,7 +541,7 @@
                         {
                             "lun": 6,
                             "createOption": "Attach",
-			    "caching": "ReadOnly",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-03'))]"
                             }
@@ -549,7 +549,7 @@
                         {
                             "lun": 7,
                             "createOption": "Attach",
-			    "caching": "ReadOnly",
+			                "caching": "ReadOnly",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanashared-01'))]"
                             }
@@ -557,7 +557,7 @@
                         {
                             "lun": 8,
                             "createOption": "Attach",
-			    "caching": "ReadOnly",
+			                "caching": "ReadOnly",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanabackup-01'))]"
                             }
@@ -565,7 +565,7 @@
 			{
                             "lun": 9,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "ReadOnly",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-usrsap-01'))]"
                             }
@@ -573,7 +573,7 @@
                         {
                             "lun": 10,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-02'))]"
                             }
@@ -668,7 +668,7 @@
                         {
                             "lun": 1,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-01'))]"
                             }
@@ -676,7 +676,7 @@
                         {
                             "lun": 2,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-03'))]"
                             }
@@ -684,8 +684,7 @@
                         {
                             "lun": 3,
                             "createOption": "Attach",
-			    "caching": "None",
-                            "writeAcceleratorEnabled": true,
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-04'))]"
                             }
@@ -693,7 +692,7 @@
                         {
                             "lun": 4,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "writeAcceleratorEnabled": true,
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-01'))]"
@@ -702,7 +701,7 @@
                         {
                             "lun": 5,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "writeAcceleratorEnabled": true,
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-02'))]"
@@ -711,7 +710,8 @@
                         {
                             "lun": 6,
                             "createOption": "Attach",
-			    "caching": "ReadOnly",
+			                "caching": "None",
+                            "writeAcceleratorEnabled": true,
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanalog-03'))]"
                             }
@@ -719,7 +719,7 @@
                         {
                             "lun": 7,
                             "createOption": "Attach",
-			    "caching": "ReadOnly",
+			                "caching": "ReadOnly",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanashared-01'))]"
                             }
@@ -727,15 +727,15 @@
                         {
                             "lun": 8,
                             "createOption": "Attach",
-			    "caching": "ReadOnly",
+			                "caching": "ReadOnly",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanabackup-01'))]"
                             }
                         },
-			{
+			            {
                             "lun": 9,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "ReadOnly",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-usrsap-01'))]"
                             }
@@ -743,7 +743,7 @@
                         {
                             "lun": 10,
                             "createOption": "Attach",
-			    "caching": "None",
+			                "caching": "None",
                             "managedDisk": {
                                 "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanadata-02'))]"
                             }
