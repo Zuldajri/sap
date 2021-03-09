@@ -37,6 +37,9 @@
         },
         "storageAccountName": {
             "type": "string"
+        },
+        "proximityPlacementGroupName": {
+            "type": "string"
         }
     },
     "variables": {
