@@ -3,14 +3,14 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "hubVnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "hubAddressPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "dmzSubnetName": {
             "type": "string"
         },
@@ -24,95 +24,113 @@
             "type": "string"
         },
         "sharedServicesSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "sharedSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "deployGatewaySubnet": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "gatewaySku": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "gatewaySubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "gatewaySubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1VnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1AddressPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1DBSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1DBSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1AppSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1AppSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1MgmtSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke1MgmtSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
+	"spoke1WebSubnetName": {
+	    "type": "string"
+	},
+        "spoke1WebSubnetPrefix": {
+	    "type": "string"
+	},
         "spoke2VnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke2AddressPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke2DBSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke2DBSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke2AppSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke2AppSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke2MgmtSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke2MgmtSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
+	"spoke2WebSubnetName": {
+	    "type": "string"
+	},
+        "spoke2WebSubnetPrefix": {
+	    "type": "string"
+	},
         "spoke3VnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke3AddressPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke3DBSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke3DBSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke3AppSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke3AppSubnetPrefix": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke3MgmtSubnetName": {
-			"type": "string"
-		},
+	    "type": "string"
+	},
         "spoke3MgmtSubnetPrefix": {
-			"type": "string"
-		}           
+	    "type": "string"
+	},
+        "spoke3WebSubnetName": {
+	    "type": "string"
+	},
+        "spoke3WebSubnetPrefix": {
+	    "type": "string"
+	}           
     },
     "variables": {
         "location": "[parameters('location')]",
@@ -136,6 +154,8 @@
         "spoke1AppSubnetPrefix": "[parameters('spoke1AppSubnetPrefix')]",
         "spoke1MgmtSubnetName": "[parameters('spoke1MgmtSubnetName')]",
         "spoke1MgmtSubnetPrefix": "[parameters('spoke1MgmtSubnetPrefix')]",
+	"spoke1WebSubnetName": "[parameters('spoke1WebSubnetName')]",
+        "spoke1WebSubnetPrefix": "[parameters('spoke1WebSubnetPrefix')]",
         "spoke2VnetName": "[parameters('spoke2VnetName')]",
         "spoke2AddressPrefix": "[parameters('spoke2AddressPrefix')]",
         "spoke2ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('spoke2VnetName'))]",
@@ -145,6 +165,8 @@
         "spoke2AppSubnetPrefix": "[parameters('spoke2AppSubnetPrefix')]",
         "spoke2MgmtSubnetName": "[parameters('spoke2MgmtSubnetName')]",
         "spoke2MgmtSubnetPrefix": "[parameters('spoke2MgmtSubnetPrefix')]",
+	"spoke2WebSubnetName": "[parameters('spoke2WebSubnetName')]",
+        "spoke2WebSubnetPrefix": "[parameters('spoke2WebSubnetPrefix')]",
         "spoke3VnetName": "[parameters('spoke3VnetName')]",
         "spoke3AddressPrefix": "[parameters('spoke3AddressPrefix')]",
         "spoke3ID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('spoke3VnetName'))]",
@@ -154,6 +176,8 @@
         "spoke3AppSubnetPrefix": "[parameters('spoke3AppSubnetPrefix')]",
         "spoke3MgmtSubnetName": "[parameters('spoke3MgmtSubnetName')]",
         "spoke3MgmtSubnetPrefix": "[parameters('spoke3MgmtSubnetPrefix')]",
+	"spoke3WebSubnetName": "[parameters('spoke3WebSubnetName')]",
+        "spoke3WebSubnetPrefix": "[parameters('spoke3WebSubnetPrefix')]",
         "gatewayName": "hubVpnGateway",
         "gatewayPIPName": "hubVpnGatewayPublicIp",
         "subnetGatewayId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]"
@@ -256,10 +280,16 @@
 							"addressPrefix": "[variables('spoke1AppSubnetPrefix')]"
 						}
 					},
-                    {
+                    			{
 						"name": "[variables('spoke1MgmtSubnetName')]",
 						"properties": {
 							"addressPrefix": "[variables('spoke1MgmtSubnetPrefix')]"
+						}
+					},
+                    			{
+						"name": "[variables('spoke1WebSubnetName')]",
+						"properties": {
+							"addressPrefix": "[variables('spoke1WebSubnetPrefix')]"
 						}
 					}
 				]
