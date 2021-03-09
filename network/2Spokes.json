@@ -5,9 +5,6 @@
         "location": {
 			"type": "string"
 		},
-        "privateDnsZoneName": {
-			"type": "string"
-		},
         "hubVnetName": {
 			"type": "string"
 		},
@@ -234,38 +231,6 @@
             }
         },
         {
-            "condition": "[equals(parameters('deployGatewaySubnet'), 'Yes')]",
-            "name": "[concat(parameters('privateDnsZoneName'), '/', 'gw-', parameters('privateDnsZoneName'), '-linkhub')]",
-            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-            "apiVersion": "2018-09-01",
-            "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('gatewaySubnetName'))]"
-            ],
-            "properties": {
-                "virtualNetwork": {
-                   "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]"
-                },
-                "registrationEnabled": true
-            }
-        },
-        {
-            "condition": "[equals(parameters('deployGatewaySubnet'), 'No')]",
-            "name": "[concat(parameters('privateDnsZoneName'), '/', 'nogw-', parameters('privateDnsZoneName'), '-linkhub')]",
-            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-            "apiVersion": "2018-09-01",
-            "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('hubVnetName'), variables('dmzSubnetName'))]"
-            ],
-            "properties": {
-                "virtualNetwork": {
-                   "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]"
-                },
-                "registrationEnabled": true
-            }
-        },
-        {
 			"type": "Microsoft.Network/virtualNetworks",
 			"name": "[variables('spoke1VnetName')]",
 			"location": "[variables('location')]",
@@ -301,21 +266,6 @@
 			}
 		},
         {
-            "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link1')]",
-            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-            "apiVersion": "2018-09-01",
-            "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke1VnetName'))]"
-            ],
-            "properties": {
-                "virtualNetwork": {
-                   "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke1VnetName'))]"
-                },
-                "registrationEnabled": true
-            }
-        },
-        {
 			"type": "Microsoft.Network/virtualNetworks",
 			"name": "[variables('spoke2VnetName')]",
 			"location": "[variables('location')]",
@@ -350,21 +300,6 @@
 				]
 			}
 		},
-        {
-            "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link2')]",
-            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-            "apiVersion": "2018-09-01",
-            "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke2VnetName'))]"
-            ],
-            "properties": {
-                "virtualNetwork": {
-                   "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('spoke2VnetName'))]"
-                },
-                "registrationEnabled": true
-            }
-        },
         {
             "condition": "[equals(parameters('deployGatewaySubnet'), 'Yes')]",
             "apiVersion": "2019-11-01",
