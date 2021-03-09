@@ -434,11 +434,12 @@
             },
             "properties": {
                 "platformFaultDomainCount": 2,
-                "platformUpdateDomainCount": 5
+                "platformUpdateDomainCount": 5,
+		"proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                }
             }
         },
-
-
 
         {
             "condition": "[or(or(equals(parameters('vmSize'),'Standard_E8s_v3'),equals(parameters('vmSize'),'Standard_E16s_v3')),or(equals(parameters('vmSize'),'Standard_E32s_v3'),equals(parameters('vmSize'),'Standard_E64s_v3')))]",
