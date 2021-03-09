@@ -389,7 +389,10 @@
             "properties": {
                 "availabilitySet": {
                     "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availSetName'))]"
-                  },                
+                 },
+		"proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                },                
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
