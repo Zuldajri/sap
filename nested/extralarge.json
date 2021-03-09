@@ -360,7 +360,10 @@
             },
             "properties": {
                 "platformFaultDomainCount": 2,
-                "platformUpdateDomainCount": 5
+                "platformUpdateDomainCount": 5,
+		"proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                }
             }
         },
         {
