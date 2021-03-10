@@ -8,7 +8,7 @@
         "hanaSubnetRef": {
             "type": "string"
         },
-	"hanaAdminSubnetRef": {
+	    "hanaAdminSubnetRef": {
             "type": "string"
         },
         "operatingSystem": {
@@ -29,7 +29,7 @@
         "staticIP": {
             "type": "string"
         },
-	"adminStaticIP": {
+	    "adminStaticIP": {
             "type": "string"
         },
         "availSetName": {
@@ -44,7 +44,7 @@
         "hanaLbIP": {
             "type": "string"
         },
-	"vnetAddressPrefix": {
+	    "vnetAddressPrefix": {
             "type": "string"
         },
         "subnetAddressPrefix": {
@@ -53,10 +53,12 @@
     },
     "variables": {
         "nicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static-NIC'), concat(parameters('vmName'),'-dynamic-NIC'))]",
-	"adminNicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static-admin-NIC'), concat(parameters('vmName'),'-dynamic-admin-NIC'))]",
-        "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
+	    "adminNicName": "[if (equals(parameters('IPAllocationMethod'),'Static'), concat(parameters('vmName'),'-static-admin-NIC'), concat(parameters('vmName'),'-dynamic-admin-NIC'))]",
+        "networkSecurityGroupNameDb": "[concat(parameters('vmName'),'-NSG-DB')]",
+        "networkSecurityGroupNameAdmin": "[concat(parameters('vmName'),'-NSG-Admin')]",
+        "hanaLbName": "[concat(parameters('vmName'),'-LB')]",
         "subnetRef": "[parameters('hanaSubnetRef')]",
-	"adminSubnetRef": "[parameters('hanaAdminSubnetRef')]",
+	    "adminSubnetRef": "[parameters('hanaAdminSubnetRef')]",
         "SLES for SAP 15 SP1": 
             {
                 "sku": "gen1",
@@ -146,7 +148,55 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('networkSecurityGroupName')]",
+            "name": "[variables('networkSecurityGroupNameDb')]",
+            "apiVersion": "2019-09-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow-internal-traffic",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [
+                                "[parameters('vnetAddressPrefix')]"
+                            ],
+                            "destinationAddressPrefixes": [
+                                "[parameters('subnetAddressPrefix')]"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "deny-inbound-traffic",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 102,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": [
+                                "[parameters('subnetAddressPrefix')]"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupNameAdmin')]",
             "apiVersion": "2019-09-01",
             "location": "[resourceGroup().location]",
             "tags": {},
@@ -155,11 +205,183 @@
         },
         {
             "apiVersion": "2019-09-01",
+            "name": "[variables('hanaLbName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupNameDb'))]"
+            ],
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerHanaFrontEnd",
+                        "properties": {
+                            "privateIPAddress": "[parameters('hanaLbIP')]",
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                      }
+                  ],
+                "backendAddressPools": [
+                    {
+                        "name": "BackendHanaServerPool",
+                        "properties": {}
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "Hana-lb-rule_30113-00",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/frontendIPConfigurations/LoadBalancerHanaFrontEnd')]"
+                            },
+                            "frontendPort": 30113,
+                            "backendPort": 30113,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('hanaLbName'), 'BackendHanaServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/probes/HanaHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Hana-lb-rule_30114-01",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/frontendIPConfigurations/LoadBalancerHanaFrontEnd')]"
+                            },
+                            "frontendPort": 30114,
+                            "backendPort": 30114,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('hanaLbName'), 'BackendHanaServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/probes/HanaHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Hana-lb-rule_30115-02",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/frontendIPConfigurations/LoadBalancerHanaFrontEnd')]"
+                            },
+                            "frontendPort": 30115,
+                            "backendPort": 30115,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('hanaLbName'), 'BackendHanaServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/probes/HanaHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Hana-lb-rule_30140-03",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/frontendIPConfigurations/LoadBalancerHanaFrontEnd')]"
+                            },
+                            "frontendPort": 30140,
+                            "backendPort": 30140,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('hanaLbName'), 'BackendHanaServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/probes/HanaHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Hana-lb-rule_30141-04",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/frontendIPConfigurations/LoadBalancerHanaFrontEnd')]"
+                            },
+                            "frontendPort": 30141,
+                            "backendPort": 30141,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('hanaLbName'), 'BackendHanaServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/probes/HanaHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "NP-EUS2-SAP-X00_dbAlb-rule_30142-05",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/frontendIPConfigurations/LoadBalancerHanaFrontEnd')]"
+                            },
+                            "frontendPort": 30142,
+                            "backendPort": 30142,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('hanaLbName'), 'BackendHanaServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('hanaLbName')), '/probes/HanaHealthProbe')]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "HanaHealthProbe",
+                            "properties": {
+                                "protocol": "Tcp",
+                                "port": 62501,
+                                "intervalInSeconds": 5,
+                                "numberOfProbes": 2
+                            }
+                    }
+                ]
+              }
+            },
+        {
+            "apiVersion": "2019-09-01",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+                "[concat('Microsoft.Network/loadBalancers/', variables('hanaLbName'))]"
             ],
             "properties": {
                 "enableAcceleratedNetworking": true,
@@ -172,23 +394,27 @@
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
                             },
-                            "privateIPAddressVersion": "IPv4"
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('hanaLbName'), 'BackendHanaServerPool')]"
+                                }
+                            ]
                         }
                     }
                 ],
                 "networkSecurityGroup": {
-					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupNameDb')))]"
                 }
             }
         },
-	{
+	    {
             "apiVersion": "2019-09-01",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('adminNicName')]",
             "location": "[resourceGroup().location]",
              "dependsOn": [
-		"[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+		        "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupNameAdmin'))]"
             ],
             "properties": {
                 "enableAcceleratedNetworking": true,
@@ -205,7 +431,7 @@
                     }
                 ],
                 "networkSecurityGroup": {
-					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupNameAdmin')))]"
                 }
             }
         },
@@ -382,7 +608,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
-		"[resourceId('Microsoft.Network/networkInterfaces',variables('adminNicName'))]",
+		        "[resourceId('Microsoft.Network/networkInterfaces',variables('adminNicName'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanashared-01'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-usrsap-01'))]",
                 "[resourceId('Microsoft.Compute/disks/', concat(parameters('vmName'),'-hanabackup-01'))]",
@@ -399,7 +625,7 @@
                 "availabilitySet": {
                     "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availSetName'))]"
                  },
-		"proximityPlacementGroup": {
+		        "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
                 },                
                 "hardwareProfile": {
@@ -527,13 +753,13 @@
                     "networkInterfaces": [
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]",
-			    "properties": {
+			                "properties": {
                                 "primary": false
                             }
                         },
 			            {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('adminNicName'))]",
-			    "properties": {
+			                "properties": {
                                 "primary": true
                             }
                         }
