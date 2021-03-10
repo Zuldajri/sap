@@ -27,13 +27,6 @@
 				"description": "Administrator username on all VMs"
 			}
 		},
-		"hanaAdminUsername": {
-			"type": "string",
-			"minLength": 1,
-			"metadata": {
-				"description": "Hana Administrator username"
-			}
-		},
 		"sshPrivateKey": {
 			"type": "string",
 			"metadata": {
@@ -68,7 +61,10 @@
 				"description": "Administrator password for OS SID ADM"
 			}
 		},
-		"linuxJumpboxVmName": {
+        "highAvailability": {
+            "type": "bool"
+        },
+		"linuxDeployerVmName": {
 			"type": "string",
 			"minLength": 1,
 			"metadata": {
@@ -89,6 +85,13 @@
 				"description": "Hana VM Name"
 			}
 		},
+        "hanaNodeRole": {
+            "type": "string",
+            "minLength": 1,
+			"metadata": {
+				"description": "Hana Node Role"
+			}
+        },
 		"dbVersion": {
 			"type": "string",
 			"minLength": 1,
@@ -120,6 +123,90 @@
             "type": "string",
             "metadata": {
                 "description": "IP Address for the HANA VM when Static IP Allocation Method has been selected"
+            }
+        },
+        "hanaLbIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the HANA LB"
+            }
+        },
+        "linuxJumpboxStaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "linuxJumpboxVmName": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "linuxJumpboxVmSize": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "linuxJumpboxImageOffer": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "linuxJumpboxImagePublisher": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "linuxJumpboxImageSku": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "windowsJumpboxStaticIP": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "windowsJumpboxVmName": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "windowsJumpboxVmSize": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "windowsJumpboxImageOffer": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "windowsJumpboxImagePublisher": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "windowsJumpboxImageSku": {
+            "type": "string",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "IP Address for the Linux Jumpbox"
             }
         },
 		"hanaImageOffer": {
@@ -212,7 +299,7 @@
 	},
 	"resources": [{
 		"type": "Microsoft.Compute/virtualMachines/extensions",
-		"name": "[concat(parameters('linuxJumpboxVmName'), '/deploySAP')]",
+		"name": "[concat(parameters('linuxDeployerVmName'), '/deploySAP')]",
 		"location": "[parameters('location')]",
 		"apiVersion": "2019-07-01",
 		"properties": {
@@ -226,7 +313,7 @@
 				]
 			},
 			"protectedSettings": {
-				"commandToExecute": "[concat('bash ', parameters('sapDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', '\"', parameters('hanaAdminUsername'), '\" ', '\"', parameters('dbSystemDbPassword'), '\" ', '\"', parameters('hanaClusterPassword'), '\" ', '\"', parameters('osSapadmPassword'), '\" ', '\"', parameters('osSidadmPassword'), '\" ', '\"', parameters('hanaVmName'), '\" ', '\"', parameters('hanaVmSize'), '\" ', '\"', parameters('dbVersion'), '\" ', '\"', parameters('hanaInstanceNumber'), '\" ', ' \"', parameters('hanaSid'), '\"', ' \"', parameters('hanaStaticIP'), '\"', ' \"', parameters('hanaAdminStaticIP'), '\"', ' \"', parameters('hanaImageOffer'), '\"', ' \"', parameters('hanaImagePublisher'), '\"', ' \"', parameters('hanaImageSku'), '\"', ' \"', parameters('storageAccountName'), '\"', ' \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value, '\"', ' \"', parameters('proximityPlacementGroupName'), '\"', ' \"', variables('resourceGroupName'), '\" ', ' \"', parameters('mgmtSubnetName'), '\"', ' \"', parameters('mgmtSubnetPrefix'), '\"', ' \"', parameters('appSubnetName'), '\"', ' \"', parameters('appSubnetPrefix'), '\"', ' \"', parameters('dbSubnetName'), '\"', ' \"', parameters('dbSubnetPrefix'), '\"', ' \"', parameters('sapUsername'), '\"', ' \"', parameters('sapPassword'), '\"', ' \"', parameters('scsStaticIP'), '\"', ' \"', parameters('app1StaticIP'), '\"', ' \"', parameters('app2StaticIP'), '\"', ' \"', parameters('app3StaticIP'), '\" ', ' \"', parameters('webStaticIP'), '\" ', variables('singlequote'), parameters('sshPrivateKey'), variables('singlequote'))]"
+				"commandToExecute": "[concat('bash ', parameters('sapDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', '\"', parameters('dbSystemDbPassword'), '\" ', '\"', parameters('hanaClusterPassword'), '\" ', '\"', parameters('osSapadmPassword'), '\" ', '\"', parameters('osSidadmPassword'), '\" ', '\"', parameters('highAvailability'), '\" ', '\"', parameters('hanaVmName'), '\" ', '\"', parameters('hanaVmSize'), '\" ', '\"', parameters('hanaNodeRole'), '\" ', '\"', parameters('dbVersion'), '\" ', '\"', parameters('hanaInstanceNumber'), '\" ', ' \"', parameters('hanaSid'), '\"', ' \"', parameters('hanaStaticIP'), '\"', ' \"', parameters('hanaAdminStaticIP'), '\"', ' \"', parameters('hanaLbIP'), '\"', ' \"', parameters('hanaImageOffer'), '\"', ' \"', parameters('hanaImagePublisher'), '\"', ' \"', parameters('hanaImageSku'), '\"', ' \"', parameters('linuxJumpboxStaticIP'), '\"', ' \"', parameters('linuxJumpboxVmName'), '\"', ' \"', parameters('linuxJumpboxVmSize'), '\"', ' \"', parameters('linuxJumpboxImageOffer'), '\"', ' \"', parameters('linuxJumpboxImagePublisher'), '\"', ' \"', parameters('linuxJumpboxImageSku'), '\"', ' \"', parameters('windowsJumpboxStaticIP'), '\"', ' \"', parameters('windowsJumpboxVmName'), '\"', ' \"', parameters('windowsJumpboxVmSize'), '\"', ' \"', parameters('windowsJumpboxImageOffer'), '\"', ' \"', parameters('windowsJumpboxImagePublisher'), '\"', ' \"', parameters('windowsJumpboxImageSku'), '\"', ' \"', parameters('adminPassword'), '\"', ' \"', parameters('storageAccountName'), '\"', ' \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value, '\"', ' \"', parameters('proximityPlacementGroupName'), '\"', ' \"', variables('resourceGroupName'), '\" ', ' \"', parameters('mgmtSubnetName'), '\"', ' \"', parameters('mgmtSubnetPrefix'), '\"', ' \"', parameters('appSubnetName'), '\"', ' \"', parameters('appSubnetPrefix'), '\"', ' \"', parameters('dbSubnetName'), '\"', ' \"', parameters('dbSubnetPrefix'), '\"', ' \"', parameters('sapUsername'), '\"', ' \"', parameters('sapPassword'), '\"', ' \"', parameters('scsStaticIP'), '\"', ' \"', parameters('app1StaticIP'), '\"', ' \"', parameters('app2StaticIP'), '\"', ' \"', parameters('app3StaticIP'), '\" ', ' \"', parameters('webStaticIP'), '\" ', variables('singlequote'), parameters('sshPrivateKey'), variables('singlequote'))]"
 			}
 		}
 	}],
