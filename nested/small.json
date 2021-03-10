@@ -458,7 +458,7 @@
             "name": "[variables('nicName')]",
             "location": "[resourceGroup().location]",
              "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupNameDb'))]"
+                "[concat('Microsoft.Network/loadBalancers/', variables('hanaLbName'))]"
             ],
             "properties": {
                 "enableAcceleratedNetworking": true,
