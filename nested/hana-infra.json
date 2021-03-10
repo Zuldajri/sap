@@ -54,6 +54,9 @@
         },
         "proximityPlacementGroupName": {
             "type": "string"
+        },
+        "hanaLbIP": {
+            "type": "string"
         }
     },
   "variables": {
@@ -119,6 +122,9 @@
                       },
                     "proximityPlacementGroupName": {
                         "value": "[parameters('proximityPlacementGroupName')]"
+                    },
+                    "hanaLbIP": {
+                        "value": "[parameters('hanaLbIP')]"
                     }
                 }
             }
@@ -172,6 +178,9 @@
                     },
                     "proximityPlacementGroupName": {
                         "value": "[parameters('proximityPlacementGroupName')]"
+                    },
+                    "hanaLbIP": {
+                        "value": "[parameters('hanaLbIP')]"
                     }
                 }
             }
@@ -225,6 +234,9 @@
                       },
                     "proximityPlacementGroupName": {
                         "value": "[parameters('proximityPlacementGroupName')]"
+                    },
+                    "hanaLbIP": {
+                        "value": "[parameters('hanaLbIP')]"
                     }
                 }
             }
@@ -278,6 +290,9 @@
                     },
                     "proximityPlacementGroupName": {
                         "value": "[parameters('proximityPlacementGroupName')]"
+                    },
+                    "hanaLbIP": {
+                        "value": "[parameters('hanaLbIP')]"
                     }
                 } 
 	        }
@@ -331,6 +346,9 @@
                       },
                     "proximityPlacementGroupName": {
                         "value": "[parameters('proximityPlacementGroupName')]"
+                    },
+                    "hanaLbIP": {
+                        "value": "[parameters('hanaLbIP')]"
                     }
                 }
             }
