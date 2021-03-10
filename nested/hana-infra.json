@@ -12,10 +12,16 @@
         "vnetName": {
             "type": "string"
         },
+	"vnetAddressPrefix": {
+            "type": "string"
+        },
         "subnetName": {
             "type": "string"
         },
-	    "adminSubnetName": {
+	"subnetAddressPrefix": {
+            "type": "string"
+        },
+	"adminSubnetName": {
             "type": "string"
         },
         "adminUsername": {
@@ -27,12 +33,12 @@
         "operatingSystem": {
             "type": "string",
             "allowedValues": [
-		        "SLES for SAP 15 SP1",
+		"SLES for SAP 15 SP1",
                 "SLES for SAP 12 SP5",
                 "SLES for SAP 12 SP4",
-		        "SLES for SAP 12 SP3",
+		"SLES for SAP 12 SP3",
                 "RHEL 7.4 for SAP HANA",
-		        "RHEL 7.5 for SAP HANA",
+		"RHEL 7.5 for SAP HANA",
                 "RHEL 7.6 for SAP HANA",
                 "RHEL 7.7 for SAP HANA"
             ]
@@ -46,7 +52,7 @@
         "hanaVmIpAllocationMethod": {
             "type": "string"
         },
-	    "storageAccountName": {
+	"storageAccountName": {
             "type": "string"
         },
         "availSetName": {
@@ -71,7 +77,7 @@
     "hanaAdminSubnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('adminSubnetName'))]",	  
     "vmSizeArray": "[split(parameters('vmSize'),' ')]",
     "vmSize": "[variables('vmSizeArray')[0]]"
-},
+  },
     "resources": [
           { 
             "condition": "[or(or(or(equals(variables('vmSize'),'Standard_E8s_v3'),equals(variables('vmSize'),'Standard_E16s_v3')),or(equals(variables('vmSize'),'Standard_E32s_v3'),equals(variables('vmSize'),'Standard_E64s_v3'))),or(or(equals(variables('vmSize'),'Standard_GS5'),equals(variables('vmSize'),'Standard_M32ts')),or(equals(variables('vmSize'),'Standard_M32ls'),equals(variables('vmSize'),'Standard_M64ls'))))]",
@@ -90,9 +96,9 @@
                     "hanaSubnetRef": {
                         "value": "[variables('hanaSubnetRef')]"
                     },
-		            "hanaAdminSubnetRef": {
-			            "value": "[variables('hanaAdminSubnetRef')]"
-		            },
+		    "hanaAdminSubnetRef": {
+			"value": "[variables('hanaAdminSubnetRef')]"
+		    },
                     "operatingSystem": {
                         "value": "[parameters('operatingSystem')]"
                     },
@@ -108,10 +114,10 @@
                     "ipAllocationMethod":{
                         "value": "[parameters('hanaVmIpAllocationMethod')]"
                     },
-		            "staticIP":{
+		    "staticIP":{
                         "value": "[parameters('staticIP')]"
                     },
-		            "adminStaticIP":{
+		    "adminStaticIP":{
                         "value": "[parameters('adminStaticIP')]"
                     },
                     "availSetName": {
@@ -119,12 +125,18 @@
                     },
                     "storageAccountName": {
                         "value": "[parameters('storageAccountName')]"
-                      },
+                    },
                     "proximityPlacementGroupName": {
                         "value": "[parameters('proximityPlacementGroupName')]"
                     },
                     "hanaLbIP": {
                         "value": "[parameters('hanaLbIP')]"
+                    },
+		    "vnetAddressPrefix": {
+                        "value": "[parameters('vnetAddressPrefix')]"
+                    },
+		    "subnetAddressPrefix": {
+                        "value": "[parameters('subnetAddressPrefix')]"
                     }
                 }
             }
@@ -181,6 +193,12 @@
                     },
                     "hanaLbIP": {
                         "value": "[parameters('hanaLbIP')]"
+                    },
+		    "vnetAddressPrefix": {
+                        "value": "[parameters('vnetAddressPrefix')]"
+                    },
+		    "subnetAddressPrefix": {
+                        "value": "[parameters('subnetAddressPrefix')]"
                     }
                 }
             }
@@ -237,6 +255,12 @@
                     },
                     "hanaLbIP": {
                         "value": "[parameters('hanaLbIP')]"
+                    },
+		    "vnetAddressPrefix": {
+                        "value": "[parameters('vnetAddressPrefix')]"
+                    },
+		    "subnetAddressPrefix": {
+                        "value": "[parameters('subnetAddressPrefix')]"
                     }
                 }
             }
@@ -293,9 +317,15 @@
                     },
                     "hanaLbIP": {
                         "value": "[parameters('hanaLbIP')]"
+                    },
+		    "vnetAddressPrefix": {
+                        "value": "[parameters('vnetAddressPrefix')]"
+                    },
+		    "subnetAddressPrefix": {
+                        "value": "[parameters('subnetAddressPrefix')]"
                     }
                 } 
-	        }
+	    }
         },
         {
             "condition": "[or(or(equals(variables('vmSize'),'Standard_M208s_v2'),equals(variables('vmSize'),'Standard_M208ms_v2')), or(equals(variables('vmSize'),'Standard_M416s_v2'),equals(variables('vmSize'),'Standard_M416ms_v2')))]",
@@ -349,6 +379,12 @@
                     },
                     "hanaLbIP": {
                         "value": "[parameters('hanaLbIP')]"
+                    },
+		    "vnetAddressPrefix": {
+                        "value": "[parameters('vnetAddressPrefix')]"
+                    },
+		    "subnetAddressPrefix": {
+                        "value": "[parameters('subnetAddressPrefix')]"
                     }
                 }
             }
