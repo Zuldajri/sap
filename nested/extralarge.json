@@ -40,6 +40,9 @@
         },
         "proximityPlacementGroupName": {
             "type": "string"
+        },
+        "hanaLbIP": {
+            "type": "string"
         }
     },
     "variables": {
