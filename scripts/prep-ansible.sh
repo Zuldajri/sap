@@ -89,6 +89,14 @@ all:
           ansible_connection:  "ssh"
           ansible_user:        "$ADMIN_USER"
 
+    jumpboxes_windows:
+      hosts:
+        $WINDOWS_JUMPBOX_STATIC_IP:
+          ansible_connection:  "winrm"
+          ansible_user:        "$ADMIN_USER"
+          ansible_password:    "$ADMIN_PASSWORD"
+          ansible_winrm_server_cert_validation: "ignore"
+
     hanadbnodes:
       hosts:
         $HANA_ADMIN_STATIC_IP:
