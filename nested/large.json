@@ -43,6 +43,12 @@
         },
         "hanaLbIP": {
             "type": "string"
+        },
+	"vnetAddressPrefix": {
+            "type": "string"
+        },
+        "subnetAddressPrefix": {
+            "type": "string"
         }
     },
     "variables": {
