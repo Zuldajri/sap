@@ -132,8 +132,8 @@
 	    "type": "string"
 	},
 	"privateDnsZoneName": {
-			"type": "string"
-	},
+	    "type": "string"
+	}
     },
     "variables": {
         "location": "[parameters('location')]",
