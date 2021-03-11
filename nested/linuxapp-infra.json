@@ -29,7 +29,7 @@
         "staticIP": {
             "type": "string"
         },
-	    "linuxJumpboxIpAllocationMethod": {
+	    "linuxAppIpAllocationMethod": {
             "type": "string"
         },
         "storageAccountName": {
