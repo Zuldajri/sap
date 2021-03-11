@@ -9,50 +9,49 @@ export DB_SYSTEMDB_PASSWORD=$2
 export HA_CLUSTER_PASSWORD=$3
 export OS_SAPADM_PASSWORD=$4
 export OS_SIDADM_PASSWORD=$5
-export HIGH_AVAILABILITY=$6
-export HANA_VM_NAME=$7
-export HANA_VM_SIZE=$8
-export HANA_NODE_ROLE=$9
-export DB_VERSION=${10}
-export INSTANCE_NUMBER=${11}
-export SID=${12}
-export HANA_STATIC_IP=${13}
-export HANA_ADMIN_STATIC_IP=${14}
-export HANA_LB_IP=${15}
-export HANA_IMAGE_OFFER=${16}
-export HANA_IMAGE_PUBLISHER=${17}
-export HANA_IMAGE_SKU=${18}
-export LINUX_JUMPBOX_STATIC_IP=${19}
-export LINUX_JUMPBOX_NAME=${20}
-export LINUX_JUMPBOX_VM_SIZE=${21}
-export LINUX_JUMPBOX_IMAGE_OFFER=${22}
-export LINUX_JUMPBOX_IMAGE_PUBLISHER=${23}
-export LINUX_JUMPBOX_IMAGE_SKU=${24}
-export WINDOWS_JUMPBOX_STATIC_IP=${25}
-export WINDOWS_JUMPBOX_NAME=${26}
-export WINDOWS_JUMPBOX_VM_SIZE=${27}
-export WINDOWS_JUMPBOX_IMAGE_OFFER=${28}
-export WINDOWS_JUMPBOX_IMAGE_PUBLISHER=${29}
-export WINDOWS_JUMPBOX_IMAGE_SKU=${30}
-export ADMIN_PASSWORD=${31}
-export STORAGE_ACCOUNT_NAME=${32}
-export STORAGE_ACCESS_KEY=${33}
-export PROXIMITY_PLACEMENT_GROUP=${34}
-export RESOURCE_GROUP_NAME=${35}
-export SUBNET_MANAGEMENT_NAME=${36}
-export SUBNET_MANAGEMENT_PREFIX=${37}
-export SUBNET_APP_NAME=${38}
-export SUBNET_APP_PREFIX=${39}
-export SUBNET_DB_NAME=${40}
-export SUBNET_DB_PREFIX=${41}
-export SAP_USER=${42}
-export SAP_PASSWORD=${43}
-export SCS_STATIC_IP=${44}
-export APP1_STATIC_IP=${45}
-export APP2_STATIC_IP=${46}
-export APP3_STATIC_IP=${47}
-export WEB_STATIC_IP=${48}
-export PRIVATE_KEY=${49}
+export HANA_VM_NAME=$6
+export HANA_VM_SIZE=$7
+export HANA_NODE_ROLE=$8
+export DB_VERSION=$9
+export INSTANCE_NUMBER=${10}
+export SID=${11}
+export HANA_STATIC_IP=${12}
+export HANA_ADMIN_STATIC_IP=${13}
+export HANA_LB_IP=${14}
+export HANA_IMAGE_OFFER=${15}
+export HANA_IMAGE_PUBLISHER=${16}
+export HANA_IMAGE_SKU=${17}
+export LINUX_JUMPBOX_STATIC_IP=${18}
+export LINUX_JUMPBOX_NAME=${19}
+export LINUX_JUMPBOX_VM_SIZE=${20}
+export LINUX_JUMPBOX_IMAGE_OFFER=${21}
+export LINUX_JUMPBOX_IMAGE_PUBLISHER=${22}
+export LINUX_JUMPBOX_IMAGE_SKU=${23}
+export WINDOWS_JUMPBOX_STATIC_IP=${24}
+export WINDOWS_JUMPBOX_NAME=${25}
+export WINDOWS_JUMPBOX_VM_SIZE=${26}
+export WINDOWS_JUMPBOX_IMAGE_OFFER=${27}
+export WINDOWS_JUMPBOX_IMAGE_PUBLISHER=${28}
+export WINDOWS_JUMPBOX_IMAGE_SKU=${29}
+export ADMIN_PASSWORD=${30}
+export STORAGE_ACCOUNT_NAME=${31}
+export STORAGE_ACCESS_KEY=${32}
+export PROXIMITY_PLACEMENT_GROUP=${33}
+export RESOURCE_GROUP_NAME=${34}
+export SUBNET_MANAGEMENT_NAME=${35}
+export SUBNET_MANAGEMENT_PREFIX=${36}
+export SUBNET_APP_NAME=${37}
+export SUBNET_APP_PREFIX=${38}
+export SUBNET_DB_NAME=${39}
+export SUBNET_DB_PREFIX=${40}
+export SAP_USER=${41}
+export SAP_PASSWORD=${42}
+export SCS_STATIC_IP=${43}
+export APP1_STATIC_IP=${44}
+export APP2_STATIC_IP=${45}
+export APP3_STATIC_IP=${46}
+export WEB_STATIC_IP=${47}
+export PRIVATE_KEY=${48}
 
 
 runuser -l $ADMIN_USER -c "echo -e \"$PRIVATE_KEY\" > ~/.ssh/id_rsa"
@@ -74,7 +73,7 @@ sudo git clone https://github.com/Zuldajri/sapansible.git
 
 
 cat > /var/lib/waagent/custom-script/download/0/sapansible/ansible/output.json <<EOF
-{"databases":[{"authentication":{"type":"key","username":"$ADMIN_USER"},"components":{"hana_database":[]},"credentials":{"db_systemdb_password":"$DB_SYSTEMDB_PASSWORD","ha_cluster_password":"$HA_CLUSTER_PASSWORD","os_sapadm_password":"$OS_SAPADM_PASSWORD","os_sidadm_password":"$OS_SIDADM_PASSWORD"},"db_version":"$DB_VERSION","filesystem":"xfs","high_availability":$HIGH_AVAILABILITY,"instance":{"instance_number":"$INSTANCE_NUMBER","sid":"$SID"},"loadbalancer":{"frontend_ip":"$HANA_LB_IP"},"nodes":[{"dbname":"$HANA_VM_NAME","ip_admin_nic":"$HANA_ADMIN_STATIC_IP","ip_db_nic":"$HANA_STATIC_IP","role":"$HANA_NODE_ROLE"}],"os":{"offer":"$HANA_IMAGE_OFFER","publisher":"$HANA_IMAGE_PUBLISHER","sku":"$HANA_IMAGE_SKU","source_image_id":""},"platform":"HANA","size":"$HANA_VM_SIZE"}],"jumpboxes":{"linux":[{"name":"$LINUX_JUMPBOX_NAME","size":"$LINUX_JUMPBOX_VM_SIZE","destroy_after_deploy":false,"private_ip_address":"$LINUX_JUMPBOX_STATIC_IP","components":["hana_studio_linux","hana_client_linux"],"authentication":{"type":"key","username":"$ADMIN_USER"},"os":{"offer":"$LINUX_JUMPBOX_IMAGE_OFFER","publisher":"$LINUX_JUMPBOX_IMAGE_PUBLISHER","sku":"$LINUX_JUMPBOX_IMAGE_SKU","source_image_id":""}}],"windows":[{"name":"$WINDOWS_JUMPBOX_NAME","size":"$WINDOWS_JUMPBOX_VM_SIZE","destroy_after_deploy":false,"private_ip_address":"$WINDOWS_JUMPBOX_STATIC_IP","components":["hana_studio_windows","hana_client_windows"],"authentication":{"type":"password","username":"$ADMIN_USER","password":"$ADMIN_PASSWORD"},"os":{"offer":"$WINDOWS_JUMPBOX_IMAGE_OFFER","publisher":"$WINDOWS_JUMPBOX_IMAGE_PUBLISHER","sku":"$WINDOWS_JUMPBOX_IMAGE_SKU","source_image_id":""}}]},"infrastructure":{"iscsi":{"iscsi_nic_ips":[[]]},"ppg":{"arm_id":[],"is_existing":false,"name":["$PROXIMITY_PLACEMENT_GROUP"]},"resource_group":{"arm_id":"","is_existing":false,"name":"$RESOURCE_GROUP_NAME"},"vnets":{"sap":{"subnet_admin":{"arm_id":"","is_existing":false,"name":"$SUBNET_MANAGEMENT_NAME","nsg":{"arm_id":"","is_existing":false,"name":"adminSubnet-nsg"},"prefix":"$SUBNET_MANAGEMENT_PREFIX"},"subnet_app":{"arm_id":"","is_existing":false,"name":"$SUBNET_APP_NAME","nsg":{"arm_id":"","is_existing":false,"name":"appSubnet-nsg"},"prefix":"$SUBNET_APP_PREFIX"},"subnet_db":{"arm_id":"","is_existing":false,"name":"$SUBNET_DB_NAME","nsg":{"arm_id":"","is_existing":false,"name":"dbSubnet-nsg"},"prefix":"$SUBNET_DB_PREFIX"}}}},"options":{"enable_prometheus":true,"enable_secure_transfer":true},"sshkey":{"path_to_private_key":"/home/$ADMIN_USER/.ssh/id_rsa","path_to_public_key":"/home/$ADMIN_USER/.ssh/authorized_keys"},"software":{"downloader":{"credentials":{"sap_password":"$SAP_PASSWORD","sap_user":"$SAP_USER"},"debug":{"cert":"charles.pem","enabled":false,"proxies":{"http":"http://127.0.0.1:8888","https":"https://127.0.0.1:8888"}},"scenarios":[{"scenario_type":"APP","product_name":"S4","product_version":"1.0","os_type":"LINUX_X64","os_version":"SLES12.3"},{"components":["PLATFORM","DATABASE","CLIENT","STUDIO","COCKPIT"],"os_type":"LINUX_X64","os_version":"SLES12.3","product_name":"HANA","product_version":"2.0","scenario_type":"DB"},{"os_type":"LINUX_X64","product_name":"RTI","scenario_type":"RTI"},{"os_type":"NT_X64","scenario_type":"BASTION"},{"os_type":"LINUX_X64","scenario_type":"BASTION"}]},"storage_account_sapbits":{"blob_container_name":"sapbits","file_share_name":"sapbits","name":"$STORAGE_ACCOUNT_NAME","storage_access_key":"$STORAGE_ACCESS_KEY"}}}
+{"databases":[{"authentication":{"type":"key","username":"$ADMIN_USER"},"components":{"hana_database":[]},"credentials":{"db_systemdb_password":"$DB_SYSTEMDB_PASSWORD","ha_cluster_password":"$HA_CLUSTER_PASSWORD","os_sapadm_password":"$OS_SAPADM_PASSWORD","os_sidadm_password":"$OS_SIDADM_PASSWORD"},"db_version":"$DB_VERSION","filesystem":"xfs","high_availability":false,"instance":{"instance_number":"$INSTANCE_NUMBER","sid":"$SID"},"loadbalancer":{"frontend_ip":"$HANA_LB_IP"},"nodes":[{"dbname":"$HANA_VM_NAME","ip_admin_nic":"$HANA_ADMIN_STATIC_IP","ip_db_nic":"$HANA_STATIC_IP","role":"$HANA_NODE_ROLE"}],"os":{"offer":"$HANA_IMAGE_OFFER","publisher":"$HANA_IMAGE_PUBLISHER","sku":"$HANA_IMAGE_SKU","source_image_id":""},"platform":"HANA","size":"$HANA_VM_SIZE"}],"jumpboxes":{"linux":[{"name":"$LINUX_JUMPBOX_NAME","size":"$LINUX_JUMPBOX_VM_SIZE","destroy_after_deploy":false,"private_ip_address":"$LINUX_JUMPBOX_STATIC_IP","components":["hana_studio_linux","hana_client_linux"],"authentication":{"type":"key","username":"$ADMIN_USER"},"os":{"offer":"$LINUX_JUMPBOX_IMAGE_OFFER","publisher":"$LINUX_JUMPBOX_IMAGE_PUBLISHER","sku":"$LINUX_JUMPBOX_IMAGE_SKU","source_image_id":""}}],"windows":[{"name":"$WINDOWS_JUMPBOX_NAME","size":"$WINDOWS_JUMPBOX_VM_SIZE","destroy_after_deploy":false,"private_ip_address":"$WINDOWS_JUMPBOX_STATIC_IP","components":["hana_studio_windows","hana_client_windows"],"authentication":{"type":"password","username":"$ADMIN_USER","password":"$ADMIN_PASSWORD"},"os":{"offer":"$WINDOWS_JUMPBOX_IMAGE_OFFER","publisher":"$WINDOWS_JUMPBOX_IMAGE_PUBLISHER","sku":"$WINDOWS_JUMPBOX_IMAGE_SKU","source_image_id":""}}]},"infrastructure":{"iscsi":{"iscsi_nic_ips":[[]]},"ppg":{"arm_id":[],"is_existing":false,"name":["$PROXIMITY_PLACEMENT_GROUP"]},"resource_group":{"arm_id":"","is_existing":false,"name":"$RESOURCE_GROUP_NAME"},"vnets":{"sap":{"subnet_admin":{"arm_id":"","is_existing":false,"name":"$SUBNET_MANAGEMENT_NAME","nsg":{"arm_id":"","is_existing":false,"name":"adminSubnet-nsg"},"prefix":"$SUBNET_MANAGEMENT_PREFIX"},"subnet_app":{"arm_id":"","is_existing":false,"name":"$SUBNET_APP_NAME","nsg":{"arm_id":"","is_existing":false,"name":"appSubnet-nsg"},"prefix":"$SUBNET_APP_PREFIX"},"subnet_db":{"arm_id":"","is_existing":false,"name":"$SUBNET_DB_NAME","nsg":{"arm_id":"","is_existing":false,"name":"dbSubnet-nsg"},"prefix":"$SUBNET_DB_PREFIX"}}}},"options":{"enable_prometheus":true,"enable_secure_transfer":true},"sshkey":{"path_to_private_key":"/home/$ADMIN_USER/.ssh/id_rsa","path_to_public_key":"/home/$ADMIN_USER/.ssh/authorized_keys"},"software":{"downloader":{"credentials":{"sap_password":"$SAP_PASSWORD","sap_user":"$SAP_USER"},"debug":{"cert":"charles.pem","enabled":false,"proxies":{"http":"http://127.0.0.1:8888","https":"https://127.0.0.1:8888"}},"scenarios":[{"scenario_type":"APP","product_name":"S4","product_version":"1.0","os_type":"LINUX_X64","os_version":"SLES12.3"},{"components":["PLATFORM","DATABASE","CLIENT","STUDIO","COCKPIT"],"os_type":"LINUX_X64","os_version":"SLES12.3","product_name":"HANA","product_version":"2.0","scenario_type":"DB"},{"os_type":"LINUX_X64","product_name":"RTI","scenario_type":"RTI"},{"os_type":"NT_X64","scenario_type":"BASTION"},{"os_type":"LINUX_X64","scenario_type":"BASTION"}]},"storage_account_sapbits":{"blob_container_name":"sapbits","file_share_name":"sapbits","name":"$STORAGE_ACCOUNT_NAME","storage_access_key":"$STORAGE_ACCESS_KEY"}}}
 EOF
 
 cat > /var/lib/waagent/custom-script/download/0/sapansible/ansible/hosts.yml <<EOF
