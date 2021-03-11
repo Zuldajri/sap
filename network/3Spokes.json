@@ -130,6 +130,9 @@
 	},
         "spoke3WebSubnetPrefix": {
 	    "type": "string"
+	},
+	"privateDnsZoneName": {
+	    "type": "string"
 	}                      
     },
     "variables": {
