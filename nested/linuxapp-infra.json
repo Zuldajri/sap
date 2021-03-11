@@ -34,6 +34,12 @@
         },
         "storageAccountName": {
             "type": "string"
+        },
+        "availSetName": {
+            "type": "string"
+        },
+        "proximityPlacementGroupName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -43,7 +49,6 @@
         "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
         "osDiskName": "[concat(parameters('vmName'),'-OsDisk')]",
         "dataDiskName": "[concat(parameters('vmName'),'-DataDisk')]",
-
         "SLES for SAP 12 SP5": 
             {
                 "sku": "gen1",
@@ -121,6 +126,22 @@
             }
         },
         {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('AvailSetName')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 5,
+		"proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                }
+            }
+        },
+        {
             "apiVersion": "2019-09-01",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('vNicName')]",
@@ -155,6 +176,12 @@
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName'))]"
             ],
             "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
+                  },
+		        "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                },                
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
