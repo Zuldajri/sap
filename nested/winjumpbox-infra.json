@@ -147,6 +147,9 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(parameters('vmName'), '/scriptextension')]",
             "location": "[parameters('location')]",
+	    "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmSize'))]"
+            ],
             "properties": {
                 "publisher": "Microsoft.Compute",
                 "type": "CustomScriptExtension",
