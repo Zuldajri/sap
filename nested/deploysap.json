@@ -62,7 +62,7 @@
 			}
 		},
         "highAvailability": {
-            "type": "bool"
+            "type": "string"
         },
 		"linuxDeployerVmName": {
 			"type": "string",
