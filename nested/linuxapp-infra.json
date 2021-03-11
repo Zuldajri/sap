@@ -1,0 +1,220 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+	    "type": "string"
+	    },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPublicKey": {
+            "type": "securestring"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "vmSize": {
+            "type": "string"
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "operatingSystem": {
+            "type": "string"
+        },
+        "staticIP": {
+            "type": "string"
+        },
+	    "linuxJumpboxIpAllocationMethod": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+        "subnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
+        "vNicName": "[concat(parameters('vmName'),'-NIC')]",
+        "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
+        "osDiskName": "[concat(parameters('vmName'),'-OsDisk')]",
+        "dataDiskName": "[concat(parameters('vmName'),'-DataDisk')]",
+
+        "SLES for SAP 12 SP5": 
+            {
+                "sku": "gen1",
+                "offer": "sles-sap-12-sp5",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES for SAP 12 SP4": 
+            {
+                "sku": "12-SP4",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES for SAP 12 SP3": 
+            {
+                "sku": "12-SP3",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+       
+        "RHEL 7.7 for SAP HANA": 
+            {
+                "sku": "7.7",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.6 for SAP HANA": 
+            {
+                "sku": "7.6",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.5 for SAP HANA": 
+            {
+                "sku": "7.5",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.4 for SAP HANA": 
+            {
+                "sku": "7.4",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        
+        "OperatingSystemSpec": {
+            "imagePublisher": "[variables(parameters('OperatingSystem')).publisher]",
+            "imageOffer": "[variables(parameters('OperatingSystem')).offer]",
+            "sku": "[variables(parameters('OperatingSystem')).sku]",
+            "version": "latest"
+        },
+        "apiVersion": "2015-06-15"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
+            "apiVersion": "2019-09-01",
+            "location": "[parameters('location')]",
+            "tags": {},
+            "properties": {
+            }
+        },
+        {
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('vNicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('StaticIP')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
+            }
+        },   
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('OperatingSystemSpec').imagePublisher]",
+                        "offer": "[variables('OperatingSystemSpec').imageOffer]",
+                        "sku": "[variables('OperatingSystemSpec').sku]",
+                        "version": "[variables('OperatingSystemSpec').version]"
+                    },
+                    "osDisk": {
+						"name": "[variables('osDiskName')]",
+						"managedDisk": {
+							"storageAccountType": "Premium_LRS"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage",
+						"diskSizeGB": 128,
+						"osType": "Linux"
+					},
+                    "dataDisks": [{
+			            "name": "[variables('dataDiskName')]",
+			            "diskSizeGB": 512,
+			            "lun": 0,
+			            "managedDisk": {
+				            "storageAccountType": "Premium_LRS"
+			            },
+			            "createOption": "Empty"
+		            }]   
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true,
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints['blob']]"
+					}
+				}
+            }
+        }
+    ],
+    "outputs": {}
+}
