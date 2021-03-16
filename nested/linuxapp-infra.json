@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-	    "type": "string"
+	        "type": "string"
 	    },
         "adminUsername": {
             "type": "string"
@@ -11,10 +11,22 @@
         "adminPublicKey": {
             "type": "securestring"
         },
-        "vmName": {
+        "vmName1": {
             "type": "string"
         },
-        "vmSize": {
+        "vmSize1": {
+            "type": "string"
+        },
+        "vmName2": {
+            "type": "string"
+        },
+        "vmSize2": {
+            "type": "string"
+        },
+        "vmName3": {
+            "type": "string"
+        },
+        "vmSize3": {
             "type": "string"
         },
         "vnetName": {
@@ -26,7 +38,13 @@
         "operatingSystem": {
             "type": "string"
         },
-        "staticIP": {
+        "staticIP1": {
+            "type": "string"
+        },
+        "staticIP2": {
+            "type": "string"
+        },
+        "staticIP3": {
             "type": "string"
         },
 	    "linuxAppIpAllocationMethod": {
@@ -40,15 +58,47 @@
         },
         "proximityPlacementGroupName": {
             "type": "string"
+        },
+        "appVmCount": {
+            "type": "string"
         }
     },
     "variables": {
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
         "subnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
-        "vNicName": "[concat(parameters('vmName'),'-NIC')]",
-        "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
-        "osDiskName": "[concat(parameters('vmName'),'-OsDisk')]",
-        "dataDiskName": "[concat(parameters('vmName'),'-DataDisk')]",
+        "networkSecurityGroupName": "App-NSG",
+        "vNicName1": "[concat(parameters('vmName1'),'-NIC')]", 
+        "osDiskName1": "[concat(parameters('vmName1'),'-OsDisk')]",
+        "dataDiskName1": "[concat(parameters('vmName1'),'-DataDisk')]",
+        "vNicName2": "[concat(parameters('vmName2'),'-NIC')]", 
+        "osDiskName2": "[concat(parameters('vmName2'),'-OsDisk')]",
+        "dataDiskName2": "[concat(parameters('vmName2'),'-DataDisk')]",
+        "vNicName3": "[concat(parameters('vmName3'),'-NIC')]", 
+        "osDiskName3": "[concat(parameters('vmName3'),'-OsDisk')]",
+        "dataDiskName3": "[concat(parameters('vmName3'),'-DataDisk')]",
+        "1":
+            {
+                "App1": "yes",
+                "App2": "no",
+                "App3": "no"
+            },
+        "2":
+            {
+                "App1": "yes",
+                "App2": "yes",
+                "App3": "no"
+            },
+        "3":
+            {
+                "App1": "yes",
+                "App2": "yes",
+                "App3": "yes"
+            },
+        "deployCount": {
+            "App1": "[variables(parameters('appVmCount')).App1]",
+            "App2": "[variables(parameters('appVmCount')).App2]",
+            "App3": "[variables(parameters('appVmCount')).App3]"
+        },
         "SLES for SAP 12 SP5": 
             {
                 "sku": "gen1",
@@ -106,7 +156,6 @@
                 "version": "latest",
                 "OSType": "Linux"
             },
-        
         "OperatingSystemSpec": {
             "imagePublisher": "[variables(parameters('OperatingSystem')).publisher]",
             "imageOffer": "[variables(parameters('OperatingSystem')).offer]",
@@ -144,7 +193,7 @@
         {
             "apiVersion": "2019-09-01",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('vNicName')]",
+            "name": "[variables('vNicName1')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
@@ -154,8 +203,8 @@
                     {
                         "name": "ipconfig1",
                         "properties": {
-                            "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[parameters('StaticIP')]",
+                            "privateIPAllocationMethod": "[parameters('linuxAppIpAllocationMethod')]",
+                            "privateIPAddress": "[parameters('staticIP1')]",
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
                             }
@@ -166,14 +215,68 @@
 					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
                 }
             }
-        },   
+        }, 
+        {
+            "condition": "[equals(variables('deployCount').App2, 'yes')]",
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('vNicName2')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('linuxAppIpAllocationMethod')]",
+                            "privateIPAddress": "[parameters('staticIP2')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
+            }
+        },
+        {   
+            "condition": "[equals(variables('deployCount').App3, 'yes')]",
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('vNicName3')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('linuxAppIpAllocationMethod')]",
+                            "privateIPAddress": "[parameters('staticIP3')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
+            }
+        },          
         {
             "apiVersion": "2019-07-01",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[parameters('vmName')]",
+            "name": "[parameters('vmName1')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName1'))]"
             ],
             "properties": {
                 "availabilitySet": {
@@ -183,10 +286,10 @@
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
                 },                
                 "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
+                    "vmSize": "[parameters('vmSize1')]"
                 },
                 "osProfile": {
-                    "computerName": "[parameters('vmName')]",
+                    "computerName": "[parameters('vmName1')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
@@ -208,7 +311,7 @@
                         "version": "[variables('OperatingSystemSpec').version]"
                     },
                     "osDisk": {
-						"name": "[variables('osDiskName')]",
+						"name": "[variables('osDiskName1')]",
 						"managedDisk": {
 							"storageAccountType": "Premium_LRS"
 						},
@@ -218,7 +321,7 @@
 						"osType": "Linux"
 					},
                     "dataDisks": [{
-			            "name": "[variables('dataDiskName')]",
+			            "name": "[variables('dataDiskName1')]",
 			            "diskSizeGB": 512,
 			            "lun": 0,
 			            "managedDisk": {
@@ -230,7 +333,159 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName1'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true,
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints['blob']]"
+					}
+				}
+            }
+        },
+        {
+            "condition": "[equals(variables('deployCount').App2, 'yes')]",
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName2')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName2'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
+                  },
+		        "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                },                
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize2')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName2')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('OperatingSystemSpec').imagePublisher]",
+                        "offer": "[variables('OperatingSystemSpec').imageOffer]",
+                        "sku": "[variables('OperatingSystemSpec').sku]",
+                        "version": "[variables('OperatingSystemSpec').version]"
+                    },
+                    "osDisk": {
+						"name": "[variables('osDiskName2')]",
+						"managedDisk": {
+							"storageAccountType": "Premium_LRS"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage",
+						"diskSizeGB": 128,
+						"osType": "Linux"
+					},
+                    "dataDisks": [{
+			            "name": "[variables('dataDiskName2')]",
+			            "diskSizeGB": 512,
+			            "lun": 0,
+			            "managedDisk": {
+				            "storageAccountType": "Premium_LRS"
+			            },
+			            "createOption": "Empty"
+		            }]   
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName2'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true,
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints['blob']]"
+					}
+				}
+            }
+        },
+        {
+            "condition": "[equals(variables('deployCount').App3, 'yes')]",
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName3')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName3'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
+                  },
+		        "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                },                
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize3')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName3')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('OperatingSystemSpec').imagePublisher]",
+                        "offer": "[variables('OperatingSystemSpec').imageOffer]",
+                        "sku": "[variables('OperatingSystemSpec').sku]",
+                        "version": "[variables('OperatingSystemSpec').version]"
+                    },
+                    "osDisk": {
+						"name": "[variables('osDiskName3')]",
+						"managedDisk": {
+							"storageAccountType": "Premium_LRS"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage",
+						"diskSizeGB": 128,
+						"osType": "Linux"
+					},
+                    "dataDisks": [{
+			            "name": "[variables('dataDiskName3')]",
+			            "diskSizeGB": 512,
+			            "lun": 0,
+			            "managedDisk": {
+				            "storageAccountType": "Premium_LRS"
+			            },
+			            "createOption": "Empty"
+		            }]   
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName3'))]"
                         }
                     ]
                 },
