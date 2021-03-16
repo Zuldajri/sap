@@ -1,0 +1,591 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+	        "type": "string"
+	    },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPublicKey": {
+            "type": "securestring"
+        },
+        "vmName1": {
+            "type": "string"
+        },
+        "vmSize1": {
+            "type": "string"
+        },
+        "vmName2": {
+            "type": "string"
+        },
+        "vmSize2": {
+            "type": "string"
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "operatingSystem": {
+            "type": "string"
+        },
+        "scsLbIp": {
+            "type": "string"
+        },
+        "ersLbIp": {
+            "type": "string"
+        },
+        "staticIP1": {
+            "type": "string"
+        },
+        "staticIP2": {
+            "type": "string"
+        },
+	    "linuxScsIpAllocationMethod": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        },
+        "availSetName": {
+            "type": "string"
+        },
+        "proximityPlacementGroupName": {
+            "type": "string"
+        },
+        "highlyAvailableScs": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
+        "subnetRef": "[concat(variables('vnetID'), '/subnets/',parameters('subnetName'))]",
+        "vNicName1": "[concat(parameters('vmName1'),'-NIC')]",
+        "vNicName2": "[concat(parameters('vmName2'),'-NIC')]",
+        "scsLbName": "SCS-LB",
+        "networkSecurityGroupName": "SCS-NSG",
+        "osDiskName1": "[concat(parameters('vmName1'),'-OsDisk')]",
+        "dataDiskName1": "[concat(parameters('vmName1'),'-DataDisk')]",
+        "osDiskName2": "[concat(parameters('vmName2'),'-OsDisk')]",
+        "dataDiskName2": "[concat(parameters('vmName2'),'-DataDisk')]",
+        "SLES for SAP 12 SP5": 
+            {
+                "sku": "gen1",
+                "offer": "sles-sap-12-sp5",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES for SAP 12 SP4": 
+            {
+                "sku": "12-SP4",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "SLES for SAP 12 SP3": 
+            {
+                "sku": "12-SP3",
+                "offer": "SLES-SAP",
+                "publisher": "SUSE",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+       
+        "RHEL 7.7 for SAP HANA": 
+            {
+                "sku": "7.7",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.6 for SAP HANA": 
+            {
+                "sku": "7.6",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.5 for SAP HANA": 
+            {
+                "sku": "7.5",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "RHEL 7.4 for SAP HANA": 
+            {
+                "sku": "7.4",
+                "offer": "RHEL-SAP-HA",
+                "publisher": "RedHat",
+                "version": "latest",
+                "OSType": "Linux"
+            },
+        "OperatingSystemSpec": {
+            "imagePublisher": "[variables(parameters('OperatingSystem')).publisher]",
+            "imageOffer": "[variables(parameters('OperatingSystem')).offer]",
+            "sku": "[variables(parameters('OperatingSystem')).sku]",
+            "version": "latest"
+        },
+        "apiVersion": "2015-06-15"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
+            "apiVersion": "2019-09-01",
+            "location": "[parameters('location')]",
+            "tags": {},
+            "properties": {
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('AvailSetName')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 5,
+		        "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-09-01",
+            "name": "[variables('scsLbName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerScsFrontEnd",
+                        "properties": {
+                            "privateIPAddress": "[parameters('scsLbIP')]",
+                            "privateIPAllocationMethod": "[parameters('linuxScsIpAllocationMethod')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    },
+                    {
+                        "name": "LoadBalancerErsFrontEnd",
+                        "properties": {
+                            "privateIPAddress": "[parameters('ersLbIP')]",
+                            "privateIPAllocationMethod": "[parameters('linuxScsIpAllocationMethod')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                  ],
+                "backendAddressPools": [
+                    {
+                        "name": "BackendScsServerPool",
+                        "properties": {}
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "Scs-lb-rule_03600-01",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/frontendIPConfigurations/LoadBalancerScsFrontEnd')]"
+                            },
+                            "frontendPort": 3600,
+                            "backendPort": 3600,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/probes/ScsHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Scs-lb-rule_50016-06",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/frontendIPConfigurations/LoadBalancerScsFrontEnd')]"
+                            },
+                            "frontendPort": 50016,
+                            "backendPort": 50016,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/probes/ScsHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Scs-lb-rule_03900-02",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/frontendIPConfigurations/LoadBalancerScsFrontEnd')]"
+                            },
+                            "frontendPort": 3900,
+                            "backendPort": 3900,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/probes/ScsHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Scs-lb-rule_50013-04",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/frontendIPConfigurations/LoadBalancerScsFrontEnd')]"
+                            },
+                            "frontendPort": 50013,
+                            "backendPort": 50013,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/probes/ScsHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Scs-lb-rule_03200-00",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/frontendIPConfigurations/LoadBalancerScsFrontEnd')]"
+                            },
+                            "frontendPort": 3200,
+                            "backendPort": 3200,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/probes/ScsHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Scs-lb-rule_50014-05",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/frontendIPConfigurations/LoadBalancerScsFrontEnd')]"
+                            },
+                            "frontendPort": 50014,
+                            "backendPort": 50014,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/probes/ScsHealthProbe')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Scs-lb-rule_08100-03",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/frontendIPConfigurations/LoadBalancerScsFrontEnd')]"
+                            },
+                            "frontendPort": 8100,
+                            "backendPort": 8100,
+                            "enableFloatingIP": true,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                            },
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('scsLbName')), '/probes/ScsHealthProbe')]"
+                            }
+                        }
+                    }
+                    
+                ],
+                "probes": [
+                    {
+                        "name": "ScsHealthProbe",
+                            "properties": {
+                                "protocol": "Tcp",
+                                "port": 62000,
+                                "intervalInSeconds": 5,
+                                "numberOfProbes": 2
+                            }
+                    }
+                ],
+                "inboundNatRules": [],
+                "inboundNatPools": []
+            }
+        },
+
+
+
+        {
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('vNicName1')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', variables('scsLbName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('linuxScsIpAllocationMethod')]",
+                            "privateIPAddress": "[parameters('staticIP1')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
+            }
+        },   
+        {
+            "condition": "[equals(parameters('highlyAvailableScs'), 'yes')]",
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('vNicName2')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', variables('scsLbName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('linuxScsIpAllocationMethod')]",
+                            "privateIPAddress": "[parameters('staticIP2')]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('scsLbName'), 'BackendScsServerPool')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('networkSecurityGroupName')))]"
+                }
+            }
+        },   
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName1')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName1'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
+                  },
+		        "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                },                
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize1')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName1')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('OperatingSystemSpec').imagePublisher]",
+                        "offer": "[variables('OperatingSystemSpec').imageOffer]",
+                        "sku": "[variables('OperatingSystemSpec').sku]",
+                        "version": "[variables('OperatingSystemSpec').version]"
+                    },
+                    "osDisk": {
+						"name": "[variables('osDiskName1')]",
+						"managedDisk": {
+							"storageAccountType": "Premium_LRS"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage",
+						"diskSizeGB": 128,
+						"osType": "Linux"
+					},
+                    "dataDisks": [{
+			            "name": "[variables('dataDiskName1')]",
+			            "diskSizeGB": 512,
+			            "lun": 0,
+			            "managedDisk": {
+				            "storageAccountType": "Premium_LRS"
+			            },
+			            "createOption": "Empty"
+		            }]   
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName1'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true,
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints['blob']]"
+					}
+				}
+            }
+        },
+        {
+            "condition": "[equals(parameters('highlyAvailableScs'), 'yes')]",
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('vmName2')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('vNicName2'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('AvailSetName'))]"
+                  },
+		        "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupName'))]"
+                },                
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize2')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName2')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('OperatingSystemSpec').imagePublisher]",
+                        "offer": "[variables('OperatingSystemSpec').imageOffer]",
+                        "sku": "[variables('OperatingSystemSpec').sku]",
+                        "version": "[variables('OperatingSystemSpec').version]"
+                    },
+                    "osDisk": {
+						"name": "[variables('osDiskName2')]",
+						"managedDisk": {
+							"storageAccountType": "Premium_LRS"
+						},
+						"caching": "ReadWrite",
+						"createOption": "FromImage",
+						"diskSizeGB": 128,
+						"osType": "Linux"
+					},
+                    "dataDisks": [{
+			            "name": "[variables('dataDiskName2')]",
+			            "diskSizeGB": 512,
+			            "lun": 0,
+			            "managedDisk": {
+				            "storageAccountType": "Premium_LRS"
+			            },
+			            "createOption": "Empty"
+		            }]   
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNicName2'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true,
+						"storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), variables('apiVersion')).primaryEndpoints['blob']]"
+					}
+				}
+            }
+        }
+    ],
+    "outputs": {}
+}
