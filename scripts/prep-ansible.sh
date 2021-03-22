@@ -72,7 +72,7 @@ runuser -l $ADMIN_USER -c "chmod 600 ~/.ssh/id_rsa*"
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 sudo apt update
-sudo apt-get install git=1:2.17.1-1ubuntu0.7
+sudo apt-get install git
 sudo apt -y install jq=1.5+dfsg-2
 sudo apt -y install python3-pip
 sudo -H pip3 install "ansible>=2.8,<2.9"
