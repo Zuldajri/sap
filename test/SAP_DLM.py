@@ -75,7 +75,7 @@ class DLM:
                     size          = dl_size,
                     time          = dl_time,
                     base_dir      = DLM.base_dir,
-                    target_dir    = "Archives",
+                    target_dir    = "APP",
                     skip_download = DLM.skip_download,
                 ))
 
