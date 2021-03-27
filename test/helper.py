@@ -13,7 +13,6 @@ import requests
 from requests.adapters import HTTPAdapter
 
 
-
 class HTTPSession(requests.Session):
     def __init__(self, auth=None, headers=None, retry=5):
         super(HTTPSession, self).__init__()
@@ -56,14 +55,20 @@ class ConfigSection(object):
             raise StopIteration
 
 
-
-
 class Config(object):
+    debug   = ConfigSection(
+        cert    = None,
+        proxies = None,
+    )
     credentials = ConfigSection(
         sap_user     = None,
         sap_password = None,
     )
-
+    scenarios    = []
+    app_scenario = None
+    db_scenario  = None
+    rti_scenario = None
+    bastion_os   = []
 
     @staticmethod
     def load(filename):
@@ -78,6 +83,13 @@ class Config(object):
 
         data = input_json["software"]["downloader"]
 
+        # Debug section
+        if "debug" in data:
+            if "enabled" in data["debug"] and data["debug"]["enabled"]:
+                Config.debug = ConfigSection(
+                    proxies = data["debug"]["proxies"] if "proxies" in data["debug"] else None,
+                    cert  = data["debug"]["cert"] if "cert" in data["debug"] else None
+                )
 
         # Credentials section
         assert("credentials" in data and \
@@ -89,4 +101,4 @@ class Config(object):
             sap_password  = data["credentials"]["sap_password"]
         )
 
-
+       
