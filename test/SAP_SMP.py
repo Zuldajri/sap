@@ -169,6 +169,52 @@ class SMP:
             allow_redirects = False,
         )
 
-   
+    @staticmethod
+    def search(query):
+        SMP.sess.headers["Accept"] = "application/json"
+        payload = {
+            "SEARCH_MAX_RESULT" : "500",
+            "RESULT_PER_PAGE"   : "500",
+            "SEARCH_STRING"     : query,
+        }
+        resp  = SMP.sess.get(
+            SMP.url_search,
+            params=payload
+        )
 
+        assert(resp.status_code == 200), \
+            "Unable to retrieve search results; status = %d" % (resp.status_code)
+
+        j = json.loads(resp.content.decode("utf-8"))
+        assert("d" in j and "results" in j["d"]), \
+            "Invalid search result format"
+        results = j["d"]["results"]
+        return results
+
+    @staticmethod
+    def retrieve(params, os_filter):
+        SMP.sess.headers["Accept"] = "application/json"
+        print("retrieving %s for %s..." % (params, os_filter))
+        payload = {
+            "_EVENT"        : "LIST",
+            "EVENT"         : "LIST",
+            "PECCLSC"       : "OS",
+            "INCL_PECCLSC1" : "OS",
+            "PECGRSC1"      : os_filter,
+        }
+        # Setting this to SUPPORT PACKAGES & PATCHES for now;
+        # may need to update logic for future scenarios
+        payload.update(SMP.params_maint)
+        payload.update(params)
+        resp  = SMP.sess.get(
+            SMP.url_retrieve,
+            params=payload,
+        )
+        assert(resp.status_code == 200), \
+            "Unable to retrieve search results; status = %d" % (resp.status_code)
+        j = json.loads(resp.content.decode("utf-8"))
+        assert("d" in j and "results" in j["d"]), \
+            "Invalid search result format"
+        results = j["d"]["results"]
+        return results
     
