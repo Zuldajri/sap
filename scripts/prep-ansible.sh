@@ -198,6 +198,8 @@ echo "=== This may take quite a while, please be patient ==="
 ansible-playbook --version
 sudo sed -i "s/ADMIN_USER/$ADMIN_USER/g" /var/lib/waagent/custom-script/download/0/sapansible/ansible/sap_playbook.yml
 sudo sed -i "s/S4SID/$S4SID/g" /var/lib/waagent/custom-script/download/0/sapansible/ansible/sap_playbook.yml
+sudo sed -i "s/MASTER_PWD/$HANA_MASTER_PASSWORD/g" /var/lib/waagent/custom-script/download/0/sapansible/ansible/group_vars/all.yml
+
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export ANSIBLE_HOST_KEY_CHECKING=False
 
