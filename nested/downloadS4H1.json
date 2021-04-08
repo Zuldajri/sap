@@ -41,9 +41,12 @@
 	},
 	"resources": [{
 		"type": "Microsoft.Compute/virtualMachines/extensions",
-		"name": "[concat(parameters('linuxDeployerVmName'), '/downloadS4Hana')]",
+		"name": "[concat(parameters('linuxDeployerVmName'), '/deploySAP')]",
 		"location": "[parameters('location')]",
 		"apiVersion": "2019-07-01",
+		"tags": {
+			"displayName": "DownloadS41"
+		},
 		"properties": {
 			"publisher": "Microsoft.Azure.Extensions",
 			"type": "CustomScript",
