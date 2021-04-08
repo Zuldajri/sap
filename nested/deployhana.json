@@ -1,0 +1,70 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Region where the resources should be created in"
+			}
+		},
+		"hanaScriptUrl": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script Url"
+			}
+		},
+		"installScriptFileName": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script file name"
+			}
+		},
+		"adminUsername": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Administrator username on all VMs"
+			}
+		},
+    "hanaVmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Hana VM Name"
+			}
+		},
+		"hanaSid": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Hana SID"
+			}
+		}
+	},
+	"variables": {
+		"singlequote": "'",
+		"resourceGroupName": "[resourceGroup().name]"
+	},
+	"resources": [{
+		"type": "Microsoft.Compute/virtualMachines/extensions",
+		"name": "[concat(parameters('hanaVmName'), '/installHana')]",
+		"location": "[parameters('location')]",
+		"apiVersion": "2019-07-01",
+		"properties": {
+			"publisher": "Microsoft.Azure.Extensions",
+			"type": "CustomScript",
+			"typeHandlerVersion": "2.0",
+			"autoUpgradeMinorVersion": true,
+			"settings": {
+				"fileUris": [
+					"[parameters('hanaScriptUrl')]"
+				]
+			},
+			"protectedSettings": {
+				"commandToExecute": "[concat('bash ', parameters('installScriptFileName'), ' \"', parameters('adminUsername'), '\" ', ' \"', parameters('hanaSid'), '\"')]"
+			}
+		}
+	}],
+	"outputs": {}
+}
