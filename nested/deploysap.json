@@ -361,6 +361,9 @@
 		"name": "[concat(parameters('linuxDeployerVmName'), '/deploySAP')]",
 		"location": "[parameters('location')]",
 		"apiVersion": "2019-07-01",
+		"tags": {
+			"displayName": "DeploySAP"
+		},
 		"properties": {
 			"publisher": "Microsoft.Azure.Extensions",
 			"type": "CustomScript",
