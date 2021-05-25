@@ -1,0 +1,69 @@
+# The name of the database schema.
+HDB_Schema_Check_Dialogs.schemaName = SAPHANADB
+
+# The password of the database schema.
+HDB_Schema_Check_Dialogs.schemaPassword = MASTER_PASSWORD
+
+# Standard system with AS ABAP only: Virtual host name for the ASCS instance. Leave empty for default.
+NW_CI_Instance.ascsVirtualHostname = LINUX_APP_VM_NAME
+
+# Instance number of the primary application server instance. Leave empty for default.
+NW_CI_Instance.ciInstanceNumber = 00
+
+# The ABAP message server port. Leave empty for default.
+NW_CI_Instance.ciMSPort = 3600
+
+# The internal ABAP message server port. Leave empty for default.
+# NW_CI_Instance.ciMSPortInternal = 
+
+# Virtual host name of the primary application server instance . Leave empty for default.
+NW_CI_Instance.ciVirtualHostname = LINUX_APP_VM_NAME
+
+# Standard system with AS Java only: Virtual host name for the SCS instance. Leave empty for default.
+NW_CI_Instance.scsVirtualHostname = LINUX_APP_VM_NAME
+
+# Are the passwords for the DDIC users different from the default value? Possible values are 'true' or 'false'. Leave empty for default.
+NW_DDIC_Password.needDDICPasswords = false
+
+# Specify whether the all operating system users are to be removed from group 'sapinst' after the execution of Software Provisioning Manager has completed.
+NW_Delete_Sapinst_Users.removeUsers = true
+
+# Master password
+NW_GetMasterPassword.masterPwd = MASTER_PASSWORD
+
+# The instance number of the SAP HANA database server
+NW_HDB_getDBInfo.instanceNumber = 00
+
+# SAP INTERNAL USE ONLY
+NW_System.installSAPHostAgent = false
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.igsExeSar = /usr/sap/install/igsexe_0-70005417.sar
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.igsHelperSar = /usr/sap/install/igshelper_17-10010245.sar
+
+# ABAP message server port for connecting to the message server, leave empty for default
+NW_checkMsgServer.abapMSPort = 3600
+
+# The load type chosen by the user. Valid values are: 'SAP', 'STD', 'OBR', 'HCP', 'MDA', 'HBR', 'SBR'
+NW_getLoadType.loadType = SAP
+
+# Provide  'profile' directory of SAP Netweaver-based system.
+NW_readProfileDir.profileDir = /usr/sap/S4SID/SYS/profile
+
+# The folder containing all archives that have been downloaded from http://support.sap.com/swdc and are supposed to be used in this procedure
+archives.downloadBasket = /usr/sap/install/
+
+# UNIX only: The group id of the 'sapsys' group, leave empty for default. The ID is ignored if the group already exists.
+nwUsers.sapsysGID = 2000
+
+# UNIX only: The user id of the <sapsid>adm user, leave empty for default. The ID is ignored if the user already exists.
+nwUsers.sidAdmUID = 2000
+
+# Instance number of the SAP HANA Database server
+storageBasedCopy.hdb.instanceNumber = 00
+
+# Password of user 'SYSTEM' inside the SAP HANA Database Server
+storageBasedCopy.hdb.systemPassword = MASTER_PASSWORD
+
