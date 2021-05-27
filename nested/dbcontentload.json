@@ -20,7 +20,7 @@
 				"description": "Deployment script file name"
 			}
 		},
-    "linuxApp1VmName": {
+    		"linuxApp1VmName": {
 			"type": "string",
 			"minLength": 1,
 			"metadata": {
@@ -34,7 +34,7 @@
 				"description": "Master Password"
 			}
 		},
-    "s4Sid": {
+    		"s4Sid": {
 			"type": "string",
 			"minLength": 1,
 			"metadata": {
