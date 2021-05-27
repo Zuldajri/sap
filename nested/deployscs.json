@@ -1,0 +1,73 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Region where the resources should be created in"
+			}
+		},
+		"installscsScriptUrl": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script Url"
+			}
+		},
+		"installscsscriptFileName": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script file name"
+			}
+		},
+		"hanaMasterPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Master Password"
+			}
+		},
+    "s4Sid": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "s4 Sid"
+			}
+		},
+    "linuxSCSVmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "SCS VM Name"
+			}
+		}
+	},
+	"variables": {
+		"singlequote": "'",
+		"resourceGroupName": "[resourceGroup().name]"
+	},
+	"resources": [{
+		"type": "Microsoft.Compute/virtualMachines/extensions",
+		"name": "[concat(parameters('linuxDeployerVmName'), '/deploySAP')]",
+		"location": "[parameters('location')]",
+		"apiVersion": "2019-07-01",
+		"tags": {
+			"displayName": "installScs"
+		},
+		"properties": {
+			"publisher": "Microsoft.Azure.Extensions",
+			"type": "CustomScript",
+			"typeHandlerVersion": "2.0",
+			"autoUpgradeMinorVersion": true,
+			"settings": {
+				"fileUris": [
+					"[parameters('installscsScriptUrl')]"
+				]
+			},
+			"protectedSettings": {
+				"commandToExecute": "[concat('bash ', parameters('installscsscriptFileName'), ' \"', parameters('hanaMasterPassword'), '\" ', ' \"', parameters('s4Sid'), '\" ', ' \"', parameters('linuxSCSVmName'), '\"')]"
+			}
+		}
+	}],
+	"outputs": {}
+}
