@@ -1,0 +1,94 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Region where the resources should be created in"
+			}
+		},
+		"dbcontentloadScriptUrl": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script Url"
+			}
+		},
+		"dbcontentloadscriptFileName": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script file name"
+			}
+		},
+    "linuxApp1VmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "PAS VM Name"
+			}
+		}
+		"hanaMasterPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Master Password"
+			}
+		},
+    "s4Sid": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "s4 Sid"
+			}
+		},
+    "hanaSid": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "hana Sid"
+			}
+		},
+    "scsStaticIP": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "scs static ip"
+			}
+		},
+    "hanaVmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "hana VM Name"
+			}
+		}
+	},
+	"variables": {
+		"singlequote": "'",
+		"resourceGroupName": "[resourceGroup().name]"
+	},
+	"resources": [{
+		"type": "Microsoft.Compute/virtualMachines/extensions",
+		"name": "[concat(parameters('linuxApp1VmName'), '/deploySAP')]",
+		"location": "[parameters('location')]",
+		"apiVersion": "2019-07-01",
+		"tags": {
+			"displayName": "dbcontentload"
+		},
+		"properties": {
+			"publisher": "Microsoft.Azure.Extensions",
+			"type": "CustomScript",
+			"typeHandlerVersion": "2.0",
+			"autoUpgradeMinorVersion": true,
+			"settings": {
+				"fileUris": [
+					"[parameters('dbcontentloadScriptUrl')]"
+				]
+			},
+			"protectedSettings": {
+				"commandToExecute": "[concat('bash ', parameters('dbcontentloadscriptFileName'), ' \"', parameters('linuxApp1VmName'), '\" ', ' \"', parameters('hanaMasterPassword'), '\" ', ' \"', parameters('s4Sid'), '\" ', ' \"', parameters('hanaSid'), '\" ', ' \"', parameters('scsStaticIP'), '\" ', ' \"', parameters('hanaVmName'), '\"')]"
+			}
+		}
+	}],
+	"outputs": {}
+}
