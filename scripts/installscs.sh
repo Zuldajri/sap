@@ -18,7 +18,7 @@ rm -f /usr/sap/install/IMDB_LCAPPS_2055_0-20010426.SAR
 
 chmod +x /usr/sap/install/SAPCAR_1010-70006178.EXE
 mkdir -p /usr/sap/install/SWPM
-SWPM20SP08_6-80003424.SAR
+
 /usr/sap/install/SAPCAR_1010-70006178.EXE -xf /usr/sap/install/SWPM20SP08_6-80003424.SAR -R /usr/sap/install/SWPM/
 
 groupadd -g 2001 sapinst
