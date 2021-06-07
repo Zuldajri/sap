@@ -86,7 +86,7 @@
 				]
 			},
 			"protectedSettings": {
-				"commandToExecute": "[concat('bash ', parameters('dbcontentloadscriptFileName'), ' \"', parameters('linuxApp1VmName'), '\" ', ' \"', parameters('hanaMasterPassword'), '\" ', ' \"', parameters('s4Sid'), '\" ', ' \"', parameters('hanaSid'), '\" ', ' \"', parameters('scsStaticIP'), '\" ', ' \"', parameters('hanaVmName'), '\"')]"
+				"commandToExecute": "[concat('bash ', parameters('dbcontentloadscriptFileName'), ' \"', parameters('hanaMasterPassword'), '\" ', ' \"', parameters('s4Sid'), '\" ', ' \"', parameters('hanaSid'), '\" ', ' \"', parameters('scsStaticIP'), '\" ', ' \"', parameters('hanaVmName'), '\"')]"
 			}
 		}
 	}],
