@@ -44,8 +44,8 @@ sudo sed -i "s/HANA_VM_NAME/$HANA_VM_NAME/g" /usr/sap/install/db.inifile.params
 sudo sed -i "s/HANASID/$HANASID/g" /usr/sap/install/db.inifile.params
 sudo sed -i "s/lowHANASID/$lowHANASID/g" /usr/sap/install/db.inifile.params
 
-chown root:sapinst db.2020.inifile.params
-chmod g+r db.2020.inifile.params
+chown root:sapinst db.inifile.params
+chmod g+r db.inifile.params
 
 chgrp -R sapsys /usr/sap/$S4SID/
 chown -R $lowHANASID /usr/sap/$S4SID/
