@@ -48,9 +48,9 @@ chown root:sapinst db.inifile.params
 chmod g+r db.inifile.params
 
 chgrp -R sapsys /usr/sap/$S4SID/
-chown -R $lowHANASID /usr/sap/$S4SID/
+chown -R $lowS4SID /usr/sap/$S4SID/
 chgrp -R sapsys /sapmnt/$S4SID/
-chown -R $lowHANASID /sapmnt/$S4SID/
+chown -R $lowS4SID /sapmnt/$S4SID/
 
 
 cd /root/
