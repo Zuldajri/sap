@@ -41,8 +41,9 @@ wget https://raw.githubusercontent.com/Zuldajri/sap/main/scripts/db.inifile.para
 sudo sed -i "s/MASTER_PASSWORD/$MASTER_PASSWORD/g" /usr/sap/install/db.inifile.params
 sudo sed -i "s/S4SID/$S4SID/g" /usr/sap/install/db.inifile.params
 sudo sed -i "s/HANA_VM_NAME/$HANA_VM_NAME/g" /usr/sap/install/db.inifile.params
-sudo sed -i "s/HANASID/$HANASID/g" /usr/sap/install/db.inifile.params
 sudo sed -i "s/lowHANASID/$lowHANASID/g" /usr/sap/install/db.inifile.params
+sudo sed -i "s/HANASID/$HANASID/g" /usr/sap/install/db.inifile.params
+
 
 chown root:sapinst db.inifile.params
 chmod g+r db.inifile.params
