@@ -77,7 +77,7 @@ NW_getLoadType.loadType = SAP
 NW_readProfileDir.profileDir = /usr/sap/S4SID/SYS/profile
 
 # The folder containing all archives that have been downloaded from http://support.sap.com/swdc and are supposed to be used in this procedure
-archives.downloadBasket = /usr/sap/install/
+archives.downloadBasket = /usr/sap/install
 
 # Password for the 'sapadm' user of the SAP Host Agent
 hostAgent.sapAdmPassword = MASTER_PASSWORD
