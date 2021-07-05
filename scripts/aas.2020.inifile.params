@@ -1,0 +1,125 @@
+# The name of the database schema.
+HDB_Schema_Check_Dialogs.schemaName = SAPHANADB
+
+# The password of the database schema.
+HDB_Schema_Check_Dialogs.schemaPassword = MASTER_PASSWORD
+
+# The  instance number of the application server. Leave empty for default.
+NW_AS.instanceNumber = 00
+
+# You can specify a virtual host name for the application server instance. Leave empty if you want to use the default physical host name. The virtual host name must already be bound to a local network interface.
+NW_DI_Instance.virtualHostname = LINUX_APP_VM_NAME
+
+# Specify whether the all operating system users are to be removed from group 'sapinst' after the execution of Software Provisioning Manager has completed.
+# NW_Delete_Sapinst_Users.removeUsers = false
+
+# Master password
+NW_GetMasterPassword.masterPwd = MASTER_PASSWORD
+
+# Skip checking if creating a HANA user store is needed. Default value is 'true'. If set to 'false', a valid HANA userstore must exists.
+# NW_HDB_DBClient.checkCreateUserstore = true
+
+# Install the SAP HANA database client in a central or local directory. Possible values are: 'SAPCPE', 'LOCAL'
+# NW_HDB_DBClient.clientPathStrategy = LOCAL
+
+# The DB admin user for SAP HANA tenant database. Default value: SYSTEM
+# NW_HDB_getDBInfo.dbadmin = SYSTEM
+
+# The instance number of the SAP HANA database server
+NW_HDB_getDBInfo.instanceNumber = 00
+
+# The SQL port for SAP HANA tenant database
+# NW_HDB_getDBInfo.tenantPort = 
+
+# DEPRECATED, DO NOT USE!
+NW_SAPCrypto.SAPCryptoFile = /usr/sap/install/SAPEXE_100-70005283.SAR
+
+# SAP INTERNAL USE ONLY
+# NW_System.installSAPHostAgent = true
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.dbaToolsSar = 
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.igsExeSar = /usr/sap/install/igsexe_1-70005417.sar
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.igsHelperSar = /usr/sap/install/igshelper_17-10010245.sar
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.sapExeDbSar = /usr/sap/install/SAPEXEDB_100-70005282.SAR
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.sapExeSar = /usr/sap/install/SAPEXE_100-70005283.SAR
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapJvmSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.xs2Sar = 
+
+# SAP offers the option to skip setting of security profile parameters (NOT recommended) only for compatibility reasons. Set to true and the file with recommended security settings will not be taken into consideration. See SAP Note 2714839 for security recommendations.
+# NW_adaptProfile.skipSecurityProfileSettings = false
+
+# SAP INTERNAL USE ONLY
+# NW_adaptProfile.templateFiles = 
+
+# ABAP message server port for connecting to the message server, leave empty for default
+NW_checkMsgServer.abapMSPort = 3600
+
+# The FQDN of the system
+# NW_getFQDN.FQDN = 
+
+# SAP INTERNAL USE ONLY
+# NW_getFQDN.resolve = true
+
+# Specify whether you want to set FQDN for the system.
+# NW_getFQDN.setFQDN = true
+
+# The load type chosen by the user. Valid values are: 'SAP', 'STD', 'OBR', 'HCP', 'MDA', 'HBR', 'SBR'
+NW_getLoadType.loadType = SAP
+
+# ABAP system is Unicode (true|false), only needed if it cannot be determined from the system.
+# NW_getUnicode.isUnicode = 
+
+# Provide  'profile' directory of SAP Netweaver-based system.
+NW_readProfileDir.profileDir = /sapmnt/S4SID/profile/
+
+# Windows only: The drive to use
+# NW_readProfileDir.sapdrive = 
+
+# The folder containing all archives that have been downloaded from http://support.sap.com/swdc and are supposed to be used in this procedure
+archives.downloadBasket = /usr/sap/install
+
+# DBACOCKPIT user is to be created. Default value is 'true'.
+# hdb.create.dbacockpit.user = true
+
+# Windows only: The domain of the SAP Host Agent user
+# hostAgent.domain = 
+
+# Password for the 'sapadm' user of the SAP Host Agent
+hostAgent.sapAdmPassword = MASTER_PASSWORD
+
+# Windows only: The domain of all users of this SAP system. Leave empty for default.
+# nwUsers.sapDomain = 
+
+# Windows only: The password of the 'SAPServiceSID' user
+# nwUsers.sapServiceSIDPassword = 
+
+# UNIX only: The user ID of the 'sapadm' user, leave empty for default. The ID is ignored if the user already exists.
+# nwUsers.sapadmUID = 
+
+# UNIX only: The group id of the 'sapsys' group, leave empty for default. The ID is ignored if the group already exists.
+nwUsers.sapsysGID = 2000
+
+# UNIX only: The user id of the <sapsid>adm user, leave empty for default. The ID is ignored if the user already exists.
+nwUsers.sidAdmUID = 2000
+
+# The password of the '<sapsid>adm' user
+nwUsers.sidadmPassword = MASTER_PASSWORD
+
+# ABAP schema password
+# storageBasedCopy.abapSchemaPassword = 
+
+# Sets the SAP<SAPSID>DB schema password using a  parameter file.
+# storageBasedCopy.javaSchemaPassword = 
