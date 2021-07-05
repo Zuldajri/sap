@@ -246,6 +246,12 @@
 				"description": "Name of the Storage Account"
 			}
         },
+		"storageAccountResourceGroupName": {
+            "type": "string",
+            "metadata": {
+				"description": "Name of the Storage Account"
+			}
+        },
 		"proximityPlacementGroupName": {
             "type": "string",
             "metadata": {
