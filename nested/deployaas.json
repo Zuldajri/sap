@@ -1,0 +1,87 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"metadata": {
+				"description": "Region where the resources should be created in"
+			}
+		},
+		"installaasScriptUrl": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script Url"
+			}
+		},
+		"installaasscriptFileName": {
+			"type": "string",
+			"metadata": {
+				"description": "Deployment script file name"
+			}
+		},
+		"hanaMasterPassword": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Master Password"
+			}
+		},
+        "s4Sid": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "s4 Sid"
+			}
+		},
+        "scsStaticIP": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "SCS VM Name"
+			}
+		},
+        "linuxApp1VmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "SCS VM Name"
+			}
+		},
+        "linuxApp2VmName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "SCS VM Name"
+			}
+		}
+	},
+	"variables": {
+		"singlequote": "'",
+		"resourceGroupName": "[resourceGroup().name]"
+	},
+	"resources": [{
+		"type": "Microsoft.Compute/virtualMachines/extensions",
+		"name": "[concat(parameters('linuxApp2VmName'), '/deploySAP')]",
+		"location": "[parameters('location')]",
+		"apiVersion": "2019-07-01",
+		"tags": {
+			"displayName": "installAas"
+		},
+		"properties": {
+			"publisher": "Microsoft.Azure.Extensions",
+			"type": "CustomScript",
+			"typeHandlerVersion": "2.0",
+			"autoUpgradeMinorVersion": true,
+			"settings": {
+				"fileUris": [
+					"[parameters('installaasScriptUrl')]"
+				]
+			},
+			"protectedSettings": {
+				"commandToExecute": "[concat('bash ', parameters('installaasscriptFileName'), ' \"', parameters('hanaMasterPassword'), '\" ', ' \"', parameters('s4Sid'), '\" ', ' \"', parameters('scsStaticIP'), '\" ', ' \"', parameters('linuxApp1VmName'), '\" ', ' \"', parameters('linuxApp2VmName'), '\"')]"
+			}
+		}
+	}],
+	"outputs": {}
+}
