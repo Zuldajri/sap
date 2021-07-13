@@ -29,8 +29,8 @@ if [ ! -d "/etc/smbcredentials" ]; then
 sudo mkdir /etc/smbcredentials
 fi
 touch /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred
-sudo bash -c 'echo "username=$STORAGE_ACCOUNT_NAME" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred'
-sudo bash -c 'echo "password=$STORAGE_ACCOUNT_KEY" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred'
+echo "username=$STORAGE_ACCOUNT_NAME" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred
+echo "password=$STORAGE_ACCOUNT_KEY" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred
 
 sudo chmod 600 /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred
 
