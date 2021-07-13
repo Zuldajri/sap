@@ -28,10 +28,10 @@ sudo mkdir /sapmnt1
 if [ ! -d "/etc/smbcredentials" ]; then
 sudo mkdir /etc/smbcredentials
 fi
-if [ ! -f "/etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred" ]; then
-    sudo bash -c 'echo "username=$STORAGE_ACCOUNT_NAME" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred'
-    sudo bash -c 'echo "password=$STORAGE_ACCOUNT_KEY" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred'
-fi
+touch /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred
+sudo bash -c 'echo "username=$STORAGE_ACCOUNT_NAME" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred'
+sudo bash -c 'echo "password=$STORAGE_ACCOUNT_KEY" >> /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred'
+
 sudo chmod 600 /etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred
 
 sudo bash -c 'echo "//$STORAGE_ACCOUNT_NAME.file.core.windows.net/sapbits /sapmnt1 cifs nofail,vers=3.0,credentials=/etc/smbcredentials/$STORAGE_ACCOUNT_NAME.cred,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
